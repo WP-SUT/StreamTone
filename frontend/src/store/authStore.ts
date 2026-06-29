@@ -20,9 +20,9 @@ export const useAuthStore = create<AuthState>()(
       login: (user) => set({ user, isAuthenticated: true }),
       logout: () => set({ user: null, isAuthenticated: false }),
       updateUser: (updates) =>
-  set((state) => ({
-    user: state.user ? { ...state.user, ...updates } as AuthUser : null,
-  })),
+        set((state) => ({
+          user: state.user ? { ...state.user, ...updates } as AuthUser : null,
+        })),
     }),
     { name: "streamtone-auth" }
   )
