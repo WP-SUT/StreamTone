@@ -1,5 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Vazirmatn:wght@300;400;500;600;700&display=swap');
 
+@font-face {
+    font-family: 'azarmehr';
+    src: url("/fonts/AzarMehrMonospacedSansBold.woff2") format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'iran-sans';
+    src: url("/public/fonts/IRANSansWeb.ttf");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 @import "tailwindcss";
 
 @theme {
@@ -56,7 +72,7 @@ html:not([dir]) {
 }
 
 html[dir="rtl"] {
-  font-family: 'Vazirmatn', sans-serif;
+  font-family: 'iran-sans', sans-serif;
 }
 
 body {

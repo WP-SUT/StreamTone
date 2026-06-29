@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Logo } from "@/components/ui/logo";
 
 const loginSchema = z.object({
   email: z
@@ -92,7 +93,8 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
             <div className="w-14 h-14 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-4 glow-primary">
-              <Music2 className="w-7 h-7 text-primary" />
+              {/* <Music2 className="w-7 h-7 text-primary" /> */}
+              <Logo/>
             </div>
             <h1 className="text-2xl font-semibold text-foreground">
               Welcome back
