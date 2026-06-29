@@ -222,7 +222,7 @@ export default function LoginPage() {
             <p className="text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
               <Link
-                href="/register"
+                href="/auth/register"
                 className="text-primary hover:text-primary/80 font-medium transition-colors"
               >
                 Create one
@@ -231,7 +231,7 @@ export default function LoginPage() {
             <p className="text-sm text-muted-foreground">
               Are you an artist?{" "}
               <Link
-                href="/register-artist"
+                href="/auth/register-artist"
                 className="text-primary hover:text-primary/80 font-medium transition-colors"
               >
                 Apply here

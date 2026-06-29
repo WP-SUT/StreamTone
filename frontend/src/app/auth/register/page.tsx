@@ -1,266 +1,431 @@
-'use client';
+// src/app/(auth)/register/page.tsx
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { toast } from 'sonner';
-import { Eye, EyeOff, Music, X } from 'lucide-react';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Loader2, X } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Logo } from "@/components/ui/logo";
 
-const schema = z
+const registerSchema = z
   .object({
-    displayName: z.string().min(2, 'نام نمایشی حداقل ۲ کاراکتر باشد'),
-    email: z.string().email('ایمیل معتبر وارد کنید'),
-    password: z.string().min(8, 'رمز عبور حداقل ۸ کاراکتر باشد'),
-    confirmPassword: z.string(),
-    dob: z.string().min(1, 'تاریخ تولد الزامی است'),
-    gender: z.enum(['male', 'female', 'other'], { required_error: 'جنسیت را انتخاب کنید' }),
-    privacy: z.boolean().refine((v) => v === true, 'پذیرش قوانین الزامی است'),
+    displayName: z
+      .string()
+      .min(1, "Display name is required")
+      .min(2, "Display name must be at least 2 characters"),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email("Please enter a valid email"),
+    password: z
+      .string()
+      .min(1, "Password is required")
+      .min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+    dateOfBirth: z.string().min(1, "Date of birth is required"),
+    gender: z.string().min(1, "Gender is required"),
+    acceptPrivacy: z.boolean().refine((val) => val === true, {
+      message: "You must accept the privacy policy",
+    }),
   })
-  .refine((d) => d.password === d.confirmPassword, {
-    message: 'رمز عبور و تکرار آن یکسان نیستند',
-    path: ['confirmPassword'],
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
   });
 
-type FormData = z.infer<typeof schema>;
-
-function PrivacyModal({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-[#1a1a2e] border border-white/10 rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col shadow-2xl">
-        <div className="flex items-center justify-between p-5 border-b border-white/10">
-          <h2 className="text-white font-semibold">سیاست حریم خصوصی</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="overflow-y-auto p-5 text-sm text-gray-300 leading-7 space-y-4 custom-scrollbar">
-          <p>
-            این سرویس متعهد به حفظ حریم خصوصی کاربران خود است. اطلاعات شخصی شما تنها برای
-            ارائه خدمات بهتر استفاده می‌شود و هرگز بدون رضایت شما به اشخاص ثالث منتقل
-            نخواهد شد.
-          </p>
-          <p>
-            با ثبت‌نام در این سرویس، شما با جمع‌آوری و پردازش اطلاعات ضروری مانند آدرس
-            ایمیل، تاریخ تولد و جنسیت موافقت می‌کنید. این اطلاعات به‌منظور شخصی‌سازی
-            تجربه کاربری و ارائه محتوای مرتبط مورد استفاده قرار می‌گیرد.
-          </p>
-          <p>
-            ما از روش‌های رمزگذاری استاندارد صنعتی برای محافظت از اطلاعات شما استفاده
-            می‌کنیم. در صورت هرگونه نگرانی درباره حریم خصوصی، می‌توانید با تیم پشتیبانی
-            ما تماس بگیرید.
-          </p>
-        </div>
-        <div className="p-5 border-t border-white/10">
-          <button
-            onClick={onClose}
-            className="w-full bg-purple-600 hover:bg-purple-500 text-white rounded-xl py-2.5 text-sm font-medium transition"
-          >
-            متوجه شدم
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [showPass, setShowPass] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      acceptPrivacy: false,
+    },
+  });
 
-  const onSubmit = async (data: FormData) => {
-    setLoading(true);
+  const acceptPrivacy = watch("acceptPrivacy");
+
+  const onSubmit = async (data: RegisterFormData) => {
+    setIsLoading(true);
     try {
-      // TODO: call register API
-      console.log(data);
-      toast.success('ثبت‌نام با موفقیت انجام شد');
-      router.push('/home');
+      // Simulate API call
+      await new Promise((res) => setTimeout(res, 1500));
+
+      toast.success("Account created!", {
+        description: "Welcome to the platform",
+      });
+
+      // Redirect to home (per PDF, page 5)
+      router.push("/home");
     } catch {
-      toast.error('خطا در ثبت‌نام، دوباره تلاش کنید');
+      toast.error("Registration failed", {
+        description: "Something went wrong. Please try again.",
+      });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <>
-      {showPrivacy && <PrivacyModal onClose={() => setShowPrivacy(false)} />}
-
-      <main
-        dir="rtl"
-        className="min-h-screen bg-[#0d0d1a] flex items-center justify-center px-4 py-12 font-['Vazirmatn']"
-      >
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-purple-800/15 rounded-full blur-[140px]" />
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 py-12">
+        {/* Background glow blobs */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-primary/8 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative w-full max-w-lg">
-          {/* Logo */}
-          <div className="flex flex-col items-center mb-7 gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-700 flex items-center justify-center shadow-lg shadow-purple-900/50">
-              <Music className="w-7 h-7 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-white">ایجاد حساب کاربری</h1>
-            <p className="text-sm text-gray-400">به جمع ما بپیوندید</p>
-          </div>
-
+        <div className="relative w-full max-w-md">
           {/* Card */}
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
+          <div className="glass rounded-2xl p-8 shadow-2xl shadow-black/40">
+            {/* Logo */}
+            <div className="flex flex-col items-center mb-8">
+              <Logo size="md" />
+              <h1 className="text-2xl font-semibold text-foreground mt-4">
+                Create an account
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Join us and start listening
+              </p>
+            </div>
+
+            {/* Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
               {/* Display Name */}
-              <Field label="نام نمایشی" error={errors.displayName?.message}>
-                <input
-                  {...register('displayName')}
-                  placeholder="نام نمایشی شما"
-                  className={inputCls}
+              <div className="space-y-1.5">
+                <Label htmlFor="displayName" className="text-sm font-medium text-foreground/80">
+                  Display Name
+                </Label>
+                <Input
+                  id="displayName"
+                  type="text"
+                  placeholder="Your name"
+                  autoComplete="name"
+                  disabled={isLoading}
+                  className={`
+                    bg-background/60 border-border/60 text-foreground placeholder:text-muted-foreground/50
+                    focus-visible:ring-primary/50 focus-visible:border-primary/60
+                    transition-colors h-11
+                    ${errors.displayName ? "border-destructive focus-visible:ring-destructive/50" : ""}
+                  `}
+                  {...register("displayName")}
                 />
-              </Field>
-
-              {/* Email */}
-              <Field label="ایمیل" error={errors.email?.message}>
-                <input
-                  {...register('email')}
-                  type="email"
-                  dir="ltr"
-                  placeholder="example@email.com"
-                  className={inputCls}
-                />
-              </Field>
-
-              {/* Password row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="رمز عبور" error={errors.password?.message}>
-                  <div className="relative">
-                    <input
-                      {...register('password')}
-                      type={showPass ? 'text' : 'password'}
-                      placeholder="••••••••"
-                      className={`${inputCls} pl-10`}
-                    />
-                    <TogglePass show={showPass} onClick={() => setShowPass((v) => !v)} />
-                  </div>
-                </Field>
-                <Field label="تکرار رمز عبور" error={errors.confirmPassword?.message}>
-                  <div className="relative">
-                    <input
-                      {...register('confirmPassword')}
-                      type={showConfirm ? 'text' : 'password'}
-                      placeholder="••••••••"
-                      className={`${inputCls} pl-10`}
-                    />
-                    <TogglePass show={showConfirm} onClick={() => setShowConfirm((v) => !v)} />
-                  </div>
-                </Field>
-              </div>
-
-              {/* DOB + Gender row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="تاریخ تولد" error={errors.dob?.message}>
-                  <input
-                    {...register('dob')}
-                    type="date"
-                    dir="ltr"
-                    className={inputCls}
-                  />
-                </Field>
-                <Field label="جنسیت" error={errors.gender?.message}>
-                  <select {...register('gender')} className={`${inputCls} cursor-pointer`}>
-                    <option value="" disabled selected>انتخاب کنید</option>
-                    <option value="male">مرد</option>
-                    <option value="female">زن</option>
-                    <option value="other">سایر</option>
-                  </select>
-                </Field>
-              </div>
-
-              {/* Privacy */}
-              <div className="space-y-1">
-                <label className="flex items-start gap-3 cursor-pointer group">
-                  <input
-                    {...register('privacy')}
-                    type="checkbox"
-                    className="mt-0.5 w-4 h-4 accent-purple-500 cursor-pointer flex-shrink-0"
-                  />
-                  <span className="text-sm text-gray-300 leading-6">
-                    <button
-                      type="button"
-                      onClick={() => setShowPrivacy(true)}
-                      className="text-purple-400 hover:text-purple-300 underline underline-offset-2 transition"
-                    >
-                      سیاست حریم خصوصی
-                    </button>
-                    {' '}را خوانده‌ام و می‌پذیرم
-                  </span>
-                </label>
-                {errors.privacy && (
-                  <p className="text-red-400 text-xs pr-7">{errors.privacy.message}</p>
+                {errors.displayName && (
+                  <p className="text-xs text-destructive">{errors.displayName.message}</p>
                 )}
               </div>
 
-              <button
+              {/* Email */}
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-sm font-medium text-foreground/80">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  disabled={isLoading}
+                  className={`
+                    bg-background/60 border-border/60 text-foreground placeholder:text-muted-foreground/50
+                    focus-visible:ring-primary/50 focus-visible:border-primary/60
+                    transition-colors h-11
+                    ${errors.email ? "border-destructive focus-visible:ring-destructive/50" : ""}
+                  `}
+                  {...register("email")}
+                />
+                {errors.email && (
+                  <p className="text-xs text-destructive">{errors.email.message}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="text-sm font-medium text-foreground/80">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    disabled={isLoading}
+                    className={`
+                      bg-background/60 border-border/60 text-foreground placeholder:text-muted-foreground/50
+                      focus-visible:ring-primary/50 focus-visible:border-primary/60
+                      transition-colors h-11 pr-10
+                      ${errors.password ? "border-destructive focus-visible:ring-destructive/50" : ""}
+                    `}
+                    {...register("password")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    disabled={isLoading}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-xs text-destructive">{errors.password.message}</p>
+                )}
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-1.5">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground/80">
+                  Confirm Password
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    disabled={isLoading}
+                    className={`
+                      bg-background/60 border-border/60 text-foreground placeholder:text-muted-foreground/50
+                      focus-visible:ring-primary/50 focus-visible:border-primary/60
+                      transition-colors h-11 pr-10
+                      ${errors.confirmPassword ? "border-destructive focus-visible:ring-destructive/50" : ""}
+                    `}
+                    {...register("confirmPassword")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    disabled={isLoading}
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
+                )}
+              </div>
+
+              {/* Date of Birth */}
+              <div className="space-y-1.5">
+                <Label htmlFor="dateOfBirth" className="text-sm font-medium text-foreground/80">
+                  Date of Birth
+                </Label>
+                <Input
+                  id="dateOfBirth"
+                  type="date"
+                  disabled={isLoading}
+                  className={`
+                    bg-background/60 border-border/60 text-foreground
+                    focus-visible:ring-primary/50 focus-visible:border-primary/60
+                    transition-colors h-11
+                    ${errors.dateOfBirth ? "border-destructive focus-visible:ring-destructive/50" : ""}
+                  `}
+                  {...register("dateOfBirth")}
+                />
+                {errors.dateOfBirth && (
+                  <p className="text-xs text-destructive">{errors.dateOfBirth.message}</p>
+                )}
+              </div>
+
+              {/* Gender */}
+              <div className="space-y-1.5">
+                <Label htmlFor="gender" className="text-sm font-medium text-foreground/80">
+                  Gender
+                </Label>
+                <Select
+                  onValueChange={(value) => setValue("gender", value)}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger
+                    className={`
+                      bg-background/60 border-border/60 text-foreground
+                      focus:ring-primary/50 focus:border-primary/60
+                      transition-colors h-11
+                      ${errors.gender ? "border-destructive" : ""}
+                    `}
+                  >
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.gender && (
+                  <p className="text-xs text-destructive">{errors.gender.message}</p>
+                )}
+              </div>
+
+              {/* Privacy Policy */}
+              <div className="space-y-1.5">
+                <div className="flex items-start gap-2">
+                  <input
+                    id="acceptPrivacy"
+                    type="checkbox"
+                    disabled={isLoading}
+                    checked={acceptPrivacy}
+                    onChange={(e) => setValue("acceptPrivacy", e.target.checked)}
+                    className="
+                      mt-0.5 w-4 h-4 rounded border-border/60 
+                      text-primary focus:ring-primary/50 focus:ring-offset-0
+                      bg-background/60 cursor-pointer
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                    "
+                  />
+                  <Label
+                    htmlFor="acceptPrivacy"
+                    className="text-sm text-muted-foreground leading-tight cursor-pointer"
+                  >
+                    I accept the{" "}
+                    <button
+                      type="button"
+                      onClick={() => setShowPrivacyModal(true)}
+                      className="text-primary hover:text-primary/80 underline transition-colors"
+                    >
+                      Privacy Policy
+                    </button>
+                  </Label>
+                </div>
+                {errors.acceptPrivacy && (
+                  <p className="text-xs text-destructive">{errors.acceptPrivacy.message}</p>
+                )}
+              </div>
+
+              {/* Submit */}
+              <Button
                 type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 disabled:opacity-50 text-white font-semibold rounded-xl py-3 text-sm transition shadow-lg shadow-purple-900/40 mt-2"
+                disabled={isLoading}
+                className="
+                  w-full h-11 mt-2
+                  bg-primary hover:bg-primary/90
+                  text-white font-medium
+                  transition-all duration-200
+                  glow-primary hover:shadow-primary/50
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                "
               >
-                {loading ? 'در حال ثبت‌نام...' : 'ثبت‌نام'}
-              </button>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  "Create account"
+                )}
+              </Button>
             </form>
 
-            <p className="text-center text-sm text-gray-400 mt-6">
-              قبلاً ثبت‌نام کرده‌اید؟{' '}
-              <Link href="/login" className="text-purple-400 hover:text-purple-300 transition font-medium">
-                وارد شوید
-              </Link>
-            </p>
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border/40" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-3 text-muted-foreground/60 tracking-wider">or</span>
+              </div>
+            </div>
+
+            {/* Sign in / Artist link */}
+            <div className="space-y-3 text-center">
+              <p className="text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="text-primary hover:text-primary/80 font-medium transition-colors"
+                >
+                  Sign in
+                </Link>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Are you an artist?{" "}
+                <Link
+                  href="/register-artist"
+                  className="text-primary hover:text-primary/80 font-medium transition-colors"
+                >
+                  Apply here
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          {/* Footer note */}
+          <p className="text-center text-xs text-muted-foreground/40 mt-6">
+            By creating an account you agree to our Terms & Privacy Policy
+          </p>
+        </div>
+      </div>
+
+      {/* Privacy Policy Modal */}
+      {showPrivacyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="glass rounded-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-start justify-between mb-4">
+              <h2 className="text-xl font-semibold text-foreground">Privacy Policy</h2>
+              <button
+                onClick={() => setShowPrivacyModal(false)}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="prose prose-sm prose-invert max-w-none">
+              <p className="text-muted-foreground leading-relaxed">
+                This is a placeholder for the privacy policy. Replace this with your actual privacy
+                policy content, including data collection practices, user rights, and legal
+                compliance information.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+                incididunt ut labore et dolore magna aliqua.
+              </p>
+            </div>
+            <Button
+              onClick={() => setShowPrivacyModal(false)}
+              className="w-full mt-6 bg-primary hover:bg-primary/90"
+            >
+              Close
+            </Button>
           </div>
         </div>
-      </main>
+      )}
     </>
-  );
-}
-
-// ── small shared helpers ────────────────────────────────────────────────────
-
-const inputCls =
-  'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition';
-
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label className="text-sm text-gray-300">{label}</label>
-      {children}
-      {error && <p className="text-red-400 text-xs">{error}</p>}
-    </div>
-  );
-}
-
-function TogglePass({ show, onClick }: { show: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
-    >
-      {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-    </button>
   );
 }
