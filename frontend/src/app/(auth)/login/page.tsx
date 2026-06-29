@@ -139,13 +139,13 @@ export default function LoginPage() {
       <div className="space-y-3 text-center">
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/auth/register" className="text-primary hover:text-primary/80 font-medium transition-colors">
+          <Link href="/register" className="text-primary hover:text-primary/80 font-medium transition-colors">
             Create one
           </Link>
         </p>
         <p className="text-sm text-muted-foreground">
           Are you an artist?{" "}
-          <Link href="/auth/register-artist" className="text-primary hover:text-primary/80 font-medium transition-colors">
+          <Link href="/register-artist" className="text-primary hover:text-primary/80 font-medium transition-colors">
             Apply here
           </Link>
         </p>

@@ -246,7 +246,7 @@ export default function ArtistRegisterPage() {
         <p className="text-sm text-muted-foreground">
           Already applied?{" "}
           <Link
-            href="/auth/login"
+            href="/login"
             className="text-primary hover:text-primary/80 font-medium transition-colors"
           >
             Sign in here
@@ -255,7 +255,7 @@ export default function ArtistRegisterPage() {
         <p className="text-sm text-muted-foreground">
           Regular user?{" "}
           <Link
-            href="/auth/register"
+            href="/register"
             className="text-primary hover:text-primary/80 font-medium transition-colors"
           >
             Create account

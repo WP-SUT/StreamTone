@@ -52,7 +52,7 @@ export interface Song {
   artistId: string;
   artistName: string;
   albumId?: string;
-  coverUrl: string;
+  coverUrl: string | undefined;
   audioUrl: string;
   duration: number;          // seconds
   genre: string;
