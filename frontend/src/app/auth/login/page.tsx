@@ -12,11 +12,9 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { AuthField } from "@/components/auth/auth-field";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import AuthHeader from "@/components/auth/Auth-Header";
-
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -25,11 +23,20 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-const inputClass = (hasError: boolean) => `
-  bg-background/60 border-border/60 text-foreground placeholder:text-muted-foreground/50
-  focus-visible:ring-primary/50 focus-visible:border-primary/60
-  transition-colors h-11${hasError ? "border-destructive focus-visible:ring-destructive/50" : ""}
-`;
+// Mock: replace with actual auth response role
+type UserRole = "user" | "artist" | "admin" | "support";
+
+const roleRedirectMap: Record<UserRole, string> = {
+  user: "/home",
+  artist: "/artist/dashboard",
+  admin: "/admin/dashboard",
+  support: "/support/dashboard",
+};
+
+const inputClass = (hasError: boolean) =>
+  `bg-background/60 border-border/60 text-foreground placeholder:text-muted-foreground/50
+   focus-visible:ring-primary/50 focus-visible:border-primary/60
+   transition-colors h-11 ${hasError ? "border-destructive focus-visible:ring-destructive/50" : ""}`;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -46,8 +53,12 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await new Promise((res) => setTimeout(res, 1200));
+
+      // TODO: replace with real auth call, get role from response
+      const role: UserRole = "user";
+
       toast.success("Welcome back!");
-      router.push("/home");
+      router.push(roleRedirectMap[role]);
     } catch {
       toast.error("Login failed", { description: "Invalid email or password." });
     } finally {
@@ -57,7 +68,8 @@ export default function LoginPage() {
 
   return (
     <>
-    <AuthHeader title="Sign in" subtitle="Welcome back"/>
+      <AuthHeader title="Sign in" subtitle="Welcome back" />
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         {/* Email */}
         <AuthField id="email" label="Email" error={errors.email?.message}>
@@ -83,11 +95,13 @@ export default function LoginPage() {
               disabled={isLoading}
               className={`${inputClass(!!errors.password)} pr-10`}
               {...register("password")}
-            /><button
+            />
+            <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               disabled={isLoading}
-              aria-label={showPassword ? "Hide password" : "Show password"}className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -97,15 +111,17 @@ export default function LoginPage() {
         {/* Forgot password */}
         <div className="flex justify-end -mt-1">
           <Link
-            href="/forgot-password"
+            href="/auth/forgot-password"
             className="text-xs text-primary hover:text-primary/80 transition-colors"
           >
             Forgot password?
           </Link>
-        </div><Button
+        </div>
+
+        <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-11 mt-2bg-primary hover:bg-primary/90 text-white font-medium transition-all glow-primary hover:shadow-primary/50 disabled:opacity-50"
+          className="w-full h-11 mt-2 bg-primary hover:bg-primary/90 text-white font-medium transition-all glow-primary hover:shadow-primary/50 disabled:opacity-50"
         >
           {isLoading ? (
             <>
@@ -120,7 +136,7 @@ export default function LoginPage() {
 
       <AuthDivider />
 
-      <div className="space-y-3text-center">
+      <div className="space-y-3 text-center">
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link href="/auth/register" className="text-primary hover:text-primary/80 font-medium transition-colors">
