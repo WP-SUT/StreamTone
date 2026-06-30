@@ -6,7 +6,7 @@ import HorizontalScrollRow from "@/components/cards/horizontal-scroll";
 import PlaylistCard from "@/components/cards/playlist-card";
 import AlbumCard from "@/components/cards/album-card";
 import SongCard from "@/components/cards/song-card";
-import GoldEarlyAccess from "./gold-early-access";
+import GoldEarlyAccess from "@/components/home/gold-early-access";
 
 
 const currentUser = mockUsers[0];
