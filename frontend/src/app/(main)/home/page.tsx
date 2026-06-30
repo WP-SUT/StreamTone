@@ -1,5 +1,75 @@
-import { Sidebar } from "@/components/layout/sidebar/sidebar";
+import { mockAlbums, mockPlaylists, mockSongs, mockUsers } from "@/mock/data";
+import UserGreeting from "./user-greeting";
+import SectionHeader from "@/components/cards/section-header";
+import HorizontalScrollRow from "@/components/cards/horizontal-scroll";
+import PlaylistCard from "@/components/cards/playlist-card";
+import AlbumCard from "@/components/cards/album-card";
+import SongCard from "@/components/cards/song-card";
+import GoldEarlyAccess from "./gold-early-access";
 
-export default function Aapp() {
-    return <div>hello world</div>
+
+const currentUser = mockUsers[0];
+
+export default function HomePage() {
+  const recentPlaylists = mockPlaylists.slice(0, 8);
+  const latestAlbums = mockAlbums.slice(0, 8);
+  const topSongs = mockSongs
+    .slice()
+    .sort((a, b) => (b.streamCount ?? 0) - (a.streamCount ?? 0))
+    .slice(0, 10);
+
+  return (
+    <main className="flex flex-col gap-10 px-4 py-6 md:px-8 max-w-screen-xl mx-auto">
+      <UserGreeting user={currentUser} />
+
+      <section>
+        <SectionHeader title="Latest Playlists" href="/playlists" />
+        <HorizontalScrollRow>
+          {recentPlaylists.map((pl) => (
+            <PlaylistCard
+              key={pl.id}
+              id={pl.id}
+              title={pl.title}
+              owner={"owner"}
+              ownerId={pl.ownerId}
+              cover={pl.coverUrl}
+              trackCount={pl.songIds.length}
+            />
+          ))}
+        </HorizontalScrollRow>
+      </section>
+
+      <section>
+        <SectionHeader title="Latest Albums" href="/albums" />
+        <HorizontalScrollRow>
+          {latestAlbums.map((album) => (
+            <AlbumCard
+              key={album.id}
+              id={album.id}
+              title={album.title}
+              artist={album.artistName}
+              artistId={album.artistId}
+              cover={album.coverUrl}
+            />
+          ))}
+        </HorizontalScrollRow>
+      </section>
+
+      <section>
+        <SectionHeader title="Most Played Songs" />
+        <ol className="flex flex-col gap-1 mt-3">
+          {topSongs.map((song, index) => (
+            <SongCard
+              key={song.id}
+              song={song}
+              index={index + 1}
+              queue={topSongs}
+            />
+          ))}
+        </ol>
+      </section>
+
+      <GoldEarlyAccess isGold={currentUser?.isPremium} />
+    </main>
+  );
 }
