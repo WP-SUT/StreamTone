@@ -1,5 +1,6 @@
+"use client"
+
 import { mockAlbums, mockPlaylists, mockSongs, mockUsers } from "@/mock/data";
-import UserGreeting from "./user-greeting";
 import SectionHeader from "@/components/cards/section-header";
 import HorizontalScrollRow from "@/components/cards/horizontal-scroll";
 import PlaylistCard from "@/components/cards/playlist-card";
@@ -20,7 +21,6 @@ export default function HomePage() {
 
   return (
     <main className="flex flex-col gap-10 px-4 py-6 md:px-8 max-w-screen-xl mx-auto">
-      <UserGreeting user={currentUser} />
 
       <section>
         <SectionHeader title="Latest Playlists" href="/playlists" />
