@@ -36,7 +36,7 @@ export function Navbar({ user }: NavbarProps) {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    router.push("/auth/login");
+    router.push("/login");
   };
 
   return (
