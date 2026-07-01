@@ -141,13 +141,4 @@ export interface Subscription {
   isActive: boolean;
 }
 
-// ─── Player state (used in Zustand) ───────────────────────
-export interface PlayerState {
-  currentSong: Song | null;
-  queue: Song[];
-  isPlaying: boolean;
-  volume: number;            // 0–1
-  progress: number;          // seconds
-  repeatMode: "off" | "one" | "all";
-  isShuffle: boolean;
-}
+
