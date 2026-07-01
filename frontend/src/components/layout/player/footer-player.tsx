@@ -16,7 +16,7 @@ import {
   ListMusic,
 } from "lucide-react";
 import { usePlayerStore } from "@/store/player-store";
-
+import QueueDrawer from "@/components/player/queue-drawer";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function formatTime(sec: number): string {
@@ -45,6 +45,7 @@ export default function FooterPlayer() {
     volume,
     repeatMode,
     isShuffle,
+    queue,
     play,
     pause,
     next,
@@ -59,6 +60,7 @@ export default function FooterPlayer() {
   // Local state
   const [muted, setMuted] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [queueOpen, setQueueOpen] = useState(false);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Brand purple as fallback
@@ -189,6 +191,22 @@ export default function FooterPlayer() {
     </button>
   );
 
+  const QueueBtn = (
+    <button
+      onClick={() => setQueueOpen(true)}
+      aria-label="View queue"
+      className="p-1 transition relative"
+      style={{ color: queueOpen ? clicked : "rgba(255,255,255,0.5)" }}
+    >
+      <ListMusic className="w-4 h-4" />
+      {queue.length > 0 && (
+        <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+          {queue.length}
+        </span>
+      )}
+    </button>
+  );
+
   const ProgressBar = (
     <div className="flex items-center gap-2 w-full">
       <span className="text-xs text-white/50 w-8 text-right tabular-nums">
@@ -211,70 +229,40 @@ export default function FooterPlayer() {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <footer
-      className="fixed bottom-0 inset-x-0 z-50 text-white shadow-lg"
-      style={{ backgroundColor: bgColor }}
-    >
-      {/* ── Mobile layout (< md) ─────────────────────────────────────────── */}
-      <div className="md:hidden flex flex-col px-3 pt-3 pb-2 gap-2">
-        {/* Row 1: cover + meta + like + prev/play/next */}
-        <div className="flex items-center gap-3">
-          {Cover}
-          {SongMeta}
-          {LikeBtn}
-          <button
-            aria-label="Previous"
-            className="p-1 text-white/70 hover:text-white transition shrink-0"
-            onClick={prev}
-          >
-            <SkipBack className="w-5 h-5" />
-          </button>
-          {PlayBtn}
-          <button
-            aria-label="Next"
-            className="p-1 text-white/70 hover:text-white transition shrink-0"
-            onClick={next}
-          >
-            <SkipForward className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Row 2: progress bar */}
-        {ProgressBar}
-
-        {/* Row 3: shuffle + repeat */}
-        <div className="flex items-center justify-center gap-6 pb-1">
-          <button
-            onClick={toggleShuffle}
-            aria-label="Shuffle"
-            className="p-1 transition"
-            style={{ color: isShuffle ? clicked : "rgba(255,255,255,0.5)" }}
-          >
-            <Shuffle className="w-4 h-4" />
-          </button>
-          <button
-            onClick={toggleRepeat}
-            aria-label="Repeat"
-            className="p-1 transition"
-            style={{ color: repeatActive ? clicked : "rgba(255,255,255,0.5)" }}
-          >
-            <RepeatIcon className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* ── Desktop layout (≥ md) ─────────────────────────────────────────── */}
-      <div className="hidden md:flex items-center gap-4 px-6 py-3">
-        {/* Left: cover + meta + like */}
-        <div className="flex items-center gap-3 w-64 shrink-0">
-          {Cover}
-          {SongMeta}
-          {LikeBtn}
-        </div>
-
-        {/* Center: controls + progress */}
-        <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
+    <>
+      <footer
+        className="fixed bottom-0 inset-x-0 z-50 text-white shadow-lg"
+        style={{ backgroundColor: bgColor }}
+      >
+        {/* ── Mobile layout (< md) ─────────────────────────────────────────── */}
+        <div className="md:hidden flex flex-col px-3 pt-3 pb-2 gap-2">
+          {/* Row 1: cover + meta + like + prev/play/next */}
           <div className="flex items-center gap-3">
+            {Cover}
+            {SongMeta}
+            {LikeBtn}
+            <button
+              aria-label="Previous"
+              className="p-1 text-white/70 hover:text-white transition shrink-0"
+              onClick={prev}
+            >
+              <SkipBack className="w-5 h-5" />
+            </button>
+            {PlayBtn}
+            <button
+              aria-label="Next"
+              className="p-1 text-white/70 hover:text-white transition shrink-0"
+              onClick={next}
+            >
+              <SkipForward className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Row 2: progress bar */}
+          {ProgressBar}
+
+          {/* Row 3: shuffle + repeat + queue */}
+          <div className="flex items-center justify-center gap-6 pb-1">
             <button
               onClick={toggleShuffle}
               aria-label="Shuffle"
@@ -284,21 +272,6 @@ export default function FooterPlayer() {
               <Shuffle className="w-4 h-4" />
             </button>
             <button
-              aria-label="Previous"
-              className="p-1 text-white/70 hover:text-white transition"
-              onClick={prev}
-            >
-              <SkipBack className="w-5 h-5" />
-            </button>
-            {PlayBtn}
-            <button
-              aria-label="Next"
-              className="p-1 text-white/70 hover:text-white transition"
-              onClick={next}
-            >
-              <SkipForward className="w-5 h-5" />
-            </button>
-            <button
               onClick={toggleRepeat}
               aria-label="Repeat"
               className="p-1 transition"
@@ -306,34 +279,86 @@ export default function FooterPlayer() {
             >
               <RepeatIcon className="w-4 h-4" />
             </button>
+            {QueueBtn}
           </div>
-          {ProgressBar}
         </div>
 
-        {/* Right: volume */}
-        <div className="flex items-center gap-2 w-36 shrink-0 justify-end">
-          <button
-            onClick={handleMuteToggle}
-            aria-label={muted ? "Unmute" : "Mute"}
-            className="p-1 text-white/70 hover:text-white transition"
-          >
-            {muted || volume === 0 ? (
-              <VolumeX className="w-4 h-4" />
-            ) : (
-              <Volume2 className="w-4 h-4" />
-            )}
-          </button>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={muted ? 0 : volume * 100}
-            onChange={handleVolumeChange}
-            className="w-24"
-            aria-label="Volume"
-          />
+        {/* ── Desktop layout (≥ md) ─────────────────────────────────────────── */}
+        <div className="hidden md:flex items-center gap-4 px-6 py-3">
+          {/* Left: cover + meta + like */}
+          <div className="flex items-center gap-3 w-64 shrink-0">
+            {Cover}
+            {SongMeta}
+            {LikeBtn}
+          </div>
+
+          {/* Center: controls + progress */}
+          <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleShuffle}
+                aria-label="Shuffle"
+                className="p-1 transition"
+                style={{ color: isShuffle ? clicked : "rgba(255,255,255,0.5)" }}
+              >
+                <Shuffle className="w-4 h-4" />
+              </button>
+              <button
+                aria-label="Previous"
+                className="p-1 text-white/70 hover:text-white transition"
+                onClick={prev}
+              >
+                <SkipBack className="w-5 h-5" />
+              </button>
+              {PlayBtn}
+              <button
+                aria-label="Next"
+                className="p-1 text-white/70 hover:text-white transition"
+                onClick={next}
+              >
+                <SkipForward className="w-5 h-5" />
+              </button>
+              <button
+                onClick={toggleRepeat}
+                aria-label="Repeat"
+                className="p-1 transition"
+                style={{ color: repeatActive ? clicked : "rgba(255,255,255,0.5)" }}
+              >
+                <RepeatIcon className="w-4 h-4" />
+              </button>
+            </div>
+            {ProgressBar}
+          </div>
+
+          {/* Right: queue + volume */}
+          <div className="flex items-center gap-3 w-48 shrink-0 justify-end">
+            {QueueBtn}
+            <button
+              onClick={handleMuteToggle}
+              aria-label={muted ? "Unmute" : "Mute"}
+              className="p-1 text-white/70 hover:text-white transition"
+            >
+              {muted || volume === 0 ? (
+                <VolumeX className="w-4 h-4" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
+            </button>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={muted ? 0 : volume * 100}
+              onChange={handleVolumeChange}
+              className="w-24"
+              aria-label="Volume"
+            />
+          </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+
+      {/* Queue Drawer */}
+      <QueueDrawer isOpen={queueOpen} onClose={() => setQueueOpen(false)} />
+    </>
   );
 }
