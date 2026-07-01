@@ -54,6 +54,7 @@ export interface Song {
   albumId?: string;
   coverUrl: string | undefined;
   audioUrl: string;
+  dominantColor: string;
   duration: number;          // seconds
   genre: string;
   releaseYear: number;
