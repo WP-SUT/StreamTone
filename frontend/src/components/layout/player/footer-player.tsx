@@ -1,4 +1,3 @@
-// src/components/layout/player/footer-player.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -14,11 +13,12 @@ import {
   Volume2,
   VolumeX,
   ListMusic,
+  Mic2,
 } from "lucide-react";
 import { usePlayerStore } from "@/store/player-store";
 import QueueDrawer from "@/components/player/queue-drawer";
+import LyricsModal from "@/components/player/lyrics-modal";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 function formatTime(sec: number): string {
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
@@ -34,9 +34,7 @@ function darken(hex: string, amount = 0.3): string {
   return `rgb(${r},${g},${b})`;
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
 export default function FooterPlayer() {
-  // Zustand store
   const {
     currentSong,
     isPlaying,
@@ -57,24 +55,20 @@ export default function FooterPlayer() {
     toggleShuffle,
   } = usePlayerStore();
 
-  // Local state
   const [muted, setMuted] = useState(false);
   const [liked, setLiked] = useState(false);
   const [queueOpen, setQueueOpen] = useState(false);
+  const [lyricsOpen, setLyricsOpen] = useState(false);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Brand purple as fallback
   const clicked = "hsl(263, 85%, 65%)";
   const accent = currentSong?.dominantColor ?? "hsl(263, 46%, 19%)";
   const bgColor = darken(accent, 0.55);
 
-  // Simulated playback tick
   useEffect(() => {
     if (isPlaying && duration > 0) {
       tickRef.current = setInterval(() => {
         setProgress(Math.min(progress + 1, duration));
-        
-        // Auto-advance when song ends
         if (progress >= duration - 1) {
           if (repeatMode === "one") {
             setProgress(0);
@@ -91,7 +85,6 @@ export default function FooterPlayer() {
     };
   }, [isPlaying, progress, duration, repeatMode, next, setProgress]);
 
-  // Reset progress on song change
   useEffect(() => {
     setProgress(0);
   }, [currentSong?.id, setProgress]);
@@ -101,43 +94,29 @@ export default function FooterPlayer() {
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
-    const newProgress = (clickX / rect.width) * duration;
-    seek(newProgress);
+    seek((clickX / rect.width) * duration);
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = Number(e.target.value) / 100;
-    setVolume(newVolume);
+    setVolume(Number(e.target.value) / 100);
     setMuted(false);
   };
 
-  const handleMuteToggle = () => {
-    if (muted) {
-      setMuted(false);
-    } else {
-      setMuted(true);
-    }
-  };
-
-  // Get repeat icon
   const RepeatIcon = repeatMode === "one" ? Repeat1 : Repeat;
   const repeatActive = repeatMode !== "off";
 
-  // If no song, render minimal placeholder
+  // ── No song placeholder (desktop only) ────────────────────────────────────
   if (!currentSong) {
     return (
       <footer
-        className="fixed bottom-0 inset-x-0 z-50 text-white shadow-lg"
+        className="hidden md:flex fixed bottom-0 inset-x-0 z-50 text-white shadow-lg items-center justify-center px-6 py-4"
         style={{ backgroundColor: bgColor }}
       >
-        <div className="flex items-center justify-center px-6 py-4">
-          <span className="text-sm text-white/50">No song playing</span>
-        </div>
+        <span className="text-sm text-white/50">No song playing</span>
       </footer>
     );
   }
 
-  // ── Shared JSX pieces ──────────────────────────────────────────────────────
   const Cover = (
     <div className="w-12 h-12 rounded-md overflow-hidden shrink-0 bg-white/10">
       {currentSong.coverUrl ? (
@@ -207,6 +186,17 @@ export default function FooterPlayer() {
     </button>
   );
 
+  const LyricsBtn = (
+    <button
+      onClick={() => setLyricsOpen((p) => !p)}
+      aria-label={lyricsOpen ? "Close lyrics" : "Show lyrics"}
+      className="p-1 transition"
+      style={{ color: lyricsOpen ? clicked : "rgba(255,255,255,0.5)" }}
+    >
+      <Mic2 className="w-4 h-4" />
+    </button>
+  );
+
   const ProgressBar = (
     <div className="flex items-center gap-2 w-full">
       <span className="text-xs text-white/50 w-8 text-right tabular-nums">
@@ -227,42 +217,23 @@ export default function FooterPlayer() {
     </div>
   );
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ── Desktop-only footer ────────────────────────────────────────────────────
   return (
     <>
       <footer
-        className="fixed bottom-0 inset-x-0 z-50 text-white shadow-lg"
+        className="hidden md:flex fixed bottom-0 inset-x-0 z-50 text-white shadow-lg items-center gap-4 px-6 py-3"
         style={{ backgroundColor: bgColor }}
       >
-        {/* ── Mobile layout (< md) ─────────────────────────────────────────── */}
-        <div className="md:hidden flex flex-col px-3 pt-3 pb-2 gap-2">
-          {/* Row 1: cover + meta + like + prev/play/next */}
+        {/* Left: cover + meta + like */}
+        <div className="flex items-center gap-3 w-64 shrink-0">
+          {Cover}
+          {SongMeta}
+          {LikeBtn}
+        </div>
+
+        {/* Center: controls + progress */}
+        <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
           <div className="flex items-center gap-3">
-            {Cover}
-            {SongMeta}
-            {LikeBtn}
-            <button
-              aria-label="Previous"
-              className="p-1 text-white/70 hover:text-white transition shrink-0"
-              onClick={prev}
-            >
-              <SkipBack className="w-5 h-5" />
-            </button>
-            {PlayBtn}
-            <button
-              aria-label="Next"
-              className="p-1 text-white/70 hover:text-white transition shrink-0"
-              onClick={next}
-            >
-              <SkipForward className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Row 2: progress bar */}
-          {ProgressBar}
-
-          {/* Row 3: shuffle + repeat + queue */}
-          <div className="flex items-center justify-center gap-6 pb-1">
             <button
               onClick={toggleShuffle}
               aria-label="Shuffle"
@@ -272,6 +243,21 @@ export default function FooterPlayer() {
               <Shuffle className="w-4 h-4" />
             </button>
             <button
+              aria-label="Previous"
+              className="p-1 text-white/70 hover:text-white transition"
+              onClick={prev}
+            >
+              <SkipBack className="w-5 h-5" />
+            </button>
+            {PlayBtn}
+            <button
+              aria-label="Next"
+              className="p-1 text-white/70 hover:text-white transition"
+              onClick={next}
+            >
+              <SkipForward className="w-5 h-5" />
+            </button>
+            <button
               onClick={toggleRepeat}
               aria-label="Repeat"
               className="p-1 transition"
@@ -279,86 +265,39 @@ export default function FooterPlayer() {
             >
               <RepeatIcon className="w-4 h-4" />
             </button>
-            {QueueBtn}
           </div>
+          {ProgressBar}
         </div>
 
-        {/* ── Desktop layout (≥ md) ─────────────────────────────────────────── */}
-        <div className="hidden md:flex items-center gap-4 px-6 py-3">
-          {/* Left: cover + meta + like */}
-          <div className="flex items-center gap-3 w-64 shrink-0">
-            {Cover}
-            {SongMeta}
-            {LikeBtn}
-          </div>
-
-          {/* Center: controls + progress */}
-          <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={toggleShuffle}
-                aria-label="Shuffle"
-                className="p-1 transition"
-                style={{ color: isShuffle ? clicked : "rgba(255,255,255,0.5)" }}
-              >
-                <Shuffle className="w-4 h-4" />
-              </button>
-              <button
-                aria-label="Previous"
-                className="p-1 text-white/70 hover:text-white transition"
-                onClick={prev}
-              >
-                <SkipBack className="w-5 h-5" />
-              </button>
-              {PlayBtn}
-              <button
-                aria-label="Next"
-                className="p-1 text-white/70 hover:text-white transition"
-                onClick={next}
-              >
-                <SkipForward className="w-5 h-5" />
-              </button>
-              <button
-                onClick={toggleRepeat}
-                aria-label="Repeat"
-                className="p-1 transition"
-                style={{ color: repeatActive ? clicked : "rgba(255,255,255,0.5)" }}
-              >
-                <RepeatIcon className="w-4 h-4" />
-              </button>
-            </div>
-            {ProgressBar}
-          </div>
-
-          {/* Right: queue + volume */}
-          <div className="flex items-center gap-3 w-48 shrink-0 justify-end">
-            {QueueBtn}
-            <button
-              onClick={handleMuteToggle}
-              aria-label={muted ? "Unmute" : "Mute"}
-              className="p-1 text-white/70 hover:text-white transition"
-            >
-              {muted || volume === 0 ? (
-                <VolumeX className="w-4 h-4" />
-              ) : (
-                <Volume2 className="w-4 h-4" />
-              )}
-            </button>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={muted ? 0 : volume * 100}
-              onChange={handleVolumeChange}
-              className="w-24"
-              aria-label="Volume"
-            />
-          </div>
+        {/* Right: lyrics + queue + volume */}
+        <div className="flex items-center gap-3 w-48 shrink-0 justify-end">
+          {LyricsBtn}
+          {QueueBtn}
+          <button
+            onClick={() => setMuted((p) => !p)}
+            aria-label={muted ? "Unmute" : "Mute"}
+            className="p-1 text-white/70 hover:text-white transition"
+          >
+            {muted || volume === 0 ? (
+              <VolumeX className="w-4 h-4" />
+            ) : (
+              <Volume2 className="w-4 h-4" />
+            )}
+          </button>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={muted ? 0 : volume * 100}
+            onChange={handleVolumeChange}
+            className="w-24"
+            aria-label="Volume"
+          />
         </div>
       </footer>
 
-      {/* Queue Drawer */}
       <QueueDrawer isOpen={queueOpen} onClose={() => setQueueOpen(false)} />
+      <LyricsModal isOpen={lyricsOpen} onClose={() => setLyricsOpen(false)} />
     </>
   );
 }

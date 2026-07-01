@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Play, Music2 } from "lucide-react";
+import { Play, Music2, Plus } from "lucide-react";
 
 interface PlaylistCardProps {
   id: string;
@@ -28,7 +28,7 @@ export default function PlaylistCard({
   return (
     <div className="group flex flex-col gap-2 w-36 sm:w-40 md:w-44 shrink-0">
       {/* Cover */}
-      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-white/10">
+      <Link href={destination} className="relative block rounded-xl overflow-hidden aspect-square bg-neutral-800">
         {cover ? (
           <Image
             src={cover}
@@ -44,53 +44,82 @@ export default function PlaylistCard({
           </div>
         )}
 
-        {/* Play overlay */}
-        <button
-          aria-label={`Play ${title}`}
-          onClick={(e) => e.preventDefault()}
+        {/* Button overlay */}
+        <div
           className="
-            absolute bottom-2 right-2
-            flex items-center justify-center
-            h-9 w-9 rounded-full
-            bg-purple-600 text-white shadow-lg
-            opacity-0 translate-y-1
-            group-hover:opacity-100 group-hover:translate-y-0
-            transition-all duration-200
+            absolute inset-0 flex items-end justify-end p-2 gap-2
+            opacity-100 sm:opacity-0 sm:group-hover:opacity-100
+            transition-opacity duration-200
           "
         >
-          <Play className="h-4 w-4 fill-white" />
-        </button>
-      </div>
+          {/* Add button */}
+          <Link
+            href="/albums-singles"
+            aria-label={`Add songs to ${title}`}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            className="
+              flex items-center justify-center
+              w-9 h-9 rounded-full
+              bg-primary text-white shadow-lg
+              hover:scale-110 active:scale-95
+              transition-transform duration-150
+            "
+          >
+            <Plus size={16} />
+          </Link>
+
+          {/* Play button */}
+          <button
+            aria-label={`Play ${title}`}
+            onClick={(e) => {
+              e.preventDefault();
+              // TODO: dispatch play action for this playlist
+            }}
+            className="
+              flex items-center justify-center
+              w-9 h-9 rounded-full
+              bg-primary text-white shadow-lg
+              hover:scale-110 active:scale-95
+              transition-transform duration-150
+            "
+          >
+            <Play size={16} fill="currentColor" />
+          </button>
+        </div>
+      </Link>
 
       {/* Info */}
       <div className="flex flex-col gap-0.5 px-0.5">
         <Link
           href={destination}
-          className="truncate text-sm font-semibold text-white hover:text-purple-400 transition-colors"
+          className="text-sm font-semibold text-white truncate hover:underline leading-tight"
+          title={title}
         >
           {title}
         </Link>
 
-        <p className="truncate text-xs text-white/50">
+        <div className="flex items-center gap-1 text-xs text-neutral-400 truncate">
           {owner && ownerId ? (
             <Link
               href={`/profile/${ownerId}`}
-              className="hover:text-white/80 transition-colors"
+              className="hover:text-white hover:underline truncate"
             >
               {owner}
             </Link>
           ) : owner ? (
-            owner
+            <span className="truncate">{owner}</span>
           ) : null}
 
           {owner && trackCount != null && (
-            <span className="mx-1">·</span>
+            <span className="shrink-0">·</span>
           )}
 
           {trackCount != null && (
-            <span>{trackCount} tracks</span>
+            <span className="shrink-0">{trackCount} {trackCount === 1 ? "track" : "tracks"}</span>
           )}
-        </p>
+        </div>
       </div>
     </div>
   );

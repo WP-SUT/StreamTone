@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Play } from "lucide-react";
+import { Music2, Play } from "lucide-react";
 
 interface AlbumCardProps {
   id: string | number;
@@ -29,19 +29,26 @@ export default function AlbumCard({
     <div className="group flex flex-col gap-2 w-36 sm:w-40 md:w-44 shrink-0">
       {/* Cover */}
       <Link href={cardHref} className="relative block rounded-xl overflow-hidden aspect-square bg-neutral-800">
-        <Image
-          src={cover}
-          alt={`${title} cover`}
-          fill
-          sizes="(max-width: 640px) 144px, (max-width: 768px) 160px, 176px"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+        {cover ? (
+          <Image
+            src={cover}
+            alt={title}
+            fill
+            sizes="(max-width: 640px) 144px, (max-width: 768px) 160px, 176px"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          /* Fallback when no cover image */
+          <div className="flex h-full w-full items-center justify-center bg-white/10">
+            <Music2 className="h-10 w-10 text-white/30" />
+          </div>
+        )}
 
         {/* Play button overlay */}
         <div
           className="
             absolute inset-0 flex items-end justify-end p-2
-            opacity-0 group-hover:opacity-100
+            opacity-100 sm:opacity-0 sm:group-hover:opacity-100
             transition-opacity duration-200
           "
         >

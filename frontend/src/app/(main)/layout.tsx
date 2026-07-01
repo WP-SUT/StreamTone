@@ -8,6 +8,7 @@ import { Navbar } from "@/components/layout/navbar/navbar";
 import FooterPlayer from "@/components/layout/player/footer-player";
 
 import type { User, Artist, StaffUser } from "@/types/models";
+import MiniPlayer from "@/components/player/mini-player";
 
 // Any logged-in user can be one of these three shapes
 type AuthedUser = User | Artist | StaffUser;
@@ -41,7 +42,7 @@ export default function MainLayout({
       dateOfBirth: "1998-05-10",
       gender: "male",
       avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=soroush",
-      role: "listener",
+      role: "artist",
       isPremium: false,
       followingArtistIds: ["a1"],
       followerIds: [],
@@ -89,7 +90,9 @@ export default function MainLayout({
           {children}
         </main>
       </div>
-      
+      <MiniPlayer
+        onExpand={() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })}
+      />
       <FooterPlayer />
     </div>
   );
