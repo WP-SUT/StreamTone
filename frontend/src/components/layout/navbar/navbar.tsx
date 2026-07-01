@@ -13,7 +13,7 @@ import {
   LogOut,
   X,
 } from "lucide-react";
-import { UserRole } from "@/types";
+import { UserRole } from "@/types/models";
 
 interface NavbarProps {
   user?: {

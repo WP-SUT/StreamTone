@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { User, Artist } from "@/types";
+import type { User, Artist } from "@/types/models";
 
 type AuthUser = User | Artist;
 

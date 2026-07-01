@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar/sidebar";
 import { Navbar } from "@/components/layout/navbar/navbar";
 
-import type { User, Artist, StaffUser, Song } from "@/types";
+import type { User, Artist, StaffUser, Song } from "@/types/models";
 import FooterPlayer from "@/components/layout/player/footer-player";
 
 // Any logged-in user can be one of these three shapes

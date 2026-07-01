@@ -1,4 +1,4 @@
-import type { User, Artist, Song, Album, Playlist } from "@/types";
+import type { User, Artist, Song, Album, Playlist } from "@/types/models";
 
 export const mockUsers: User[] = [
   {

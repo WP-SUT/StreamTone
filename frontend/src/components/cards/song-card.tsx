@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Play, MoreHorizontal } from "lucide-react";
-import { Song } from "@/types";
+import { Song } from "@/types/models";
 
 interface SongCardProps {
   song: Song;

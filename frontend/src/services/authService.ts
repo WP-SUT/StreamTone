@@ -1,5 +1,5 @@
 import { mockUsers, mockArtists } from "@/mock/data";
-import type { User, Artist } from "@/types";
+import type { User, Artist } from "@/types/models";
 
 // Simulate async network delay
 const delay = (ms = 400) => new Promise((r) => setTimeout(r, ms));
