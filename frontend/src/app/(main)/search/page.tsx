@@ -132,7 +132,6 @@ export default function SearchPage() {
                                         key={song.id}
                                         song={song}
                                         index={idx + 1}
-                                        onPlay={() => console.log("play", song.id)}
                                     />
                                 ))}
                             </div>

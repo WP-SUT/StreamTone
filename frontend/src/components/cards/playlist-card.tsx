@@ -54,7 +54,7 @@ export default function PlaylistCard({
         >
           {/* Add button */}
           <Link
-            href="/albums-singles"
+            href="/albums-and-singles"
             aria-label={`Add songs to ${title}`}
             onClick={(e) => {
               e.stopPropagation();

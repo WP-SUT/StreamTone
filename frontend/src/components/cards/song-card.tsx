@@ -64,8 +64,8 @@ export default function SongCard({ song, index, queue }: SongCardProps) {
           </span>
         ) : null}
 
-        {/* Album cover with play button overlay */}
-        <div className="relative flex-shrink-0 w-10 h-10 group/cover">
+        {/* Album cover */}
+        <div className="relative flex-shrink-0 w-10 h-10">
           <Image
             src={coverUrl as string}
             alt={`${title} cover`}
@@ -73,21 +73,6 @@ export default function SongCard({ song, index, queue }: SongCardProps) {
             height={40}
             className="rounded object-cover"
           />
-          <div
-            className={`absolute inset-0 bg-black/40 rounded flex items-center justify-center transition-opacity ${
-              isCurrentlyPlaying
-                ? "opacity-100"
-                : "opacity-0 group-hover/cover:opacity-100"
-            }`}
-          >
-            <button
-              aria-label={`Play ${title}`}
-              onClick={handlePlay}
-              className="w-6 h-6 bg-primary rounded-full flex items-center justify-center hover:scale-110 transition-transform"
-            >
-              <Play size={12} fill="currentColor" />
-            </button>
-          </div>
         </div>
 
         {/* Title and artist */}
@@ -103,18 +88,27 @@ export default function SongCard({ song, index, queue }: SongCardProps) {
         </div>
 
         {/* Duration */}
-        <span className="text-sm text-gray-400 flex-shrink-0">
+        <span className="text-sm text-gray-400 flex-shrink-0 hidden lg:block">
           {formatDuration(duration)}
         </span>
 
         {/* Action buttons */}
-        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
           <button
             aria-label={`Like ${title}`}
             className="text-gray-400 hover:text-white transition-colors"
           >
             <Heart size={16} />
           </button>
+          
+          <button
+            aria-label={`Play ${title}`}
+            onClick={handlePlay}
+            className="w-8 h-8 bg-primary rounded-full flex items-center justify-center hover:scale-110 transition-transform"
+          >
+            <Play size={14} fill="currentColor" />
+          </button>
+
           <div className="relative">
             <button
               aria-label="More options"

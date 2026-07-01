@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import PlaylistCard from "@/components/cards/playlist-card";
 import SectionHeader from "@/components/cards/section-header";
 import { usePlaylistStore } from "@/store/playlist-store";
+import CardList from "@/components/cards/card-list";
 
 export default function PlaylistsPage() {
   const playlists = usePlaylistStore((state) => state.playlists);
@@ -25,7 +26,7 @@ export default function PlaylistsPage() {
 
       {/* Playlists Flex Wrap */}
       {playlists.length > 0 ? (
-        <div className="flex flex-wrap gap-3 sm:gap-4">
+        <CardList>
           {playlists.map((playlist) => (
             <PlaylistCard
               key={playlist.id}
@@ -36,7 +37,7 @@ export default function PlaylistsPage() {
               trackCount={playlist.songIds.length}
             />
           ))}
-        </div>
+        </CardList> 
       ) : (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <p className="text-neutral-400 mb-4">No playlists yet</p>
