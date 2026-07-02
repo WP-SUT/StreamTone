@@ -57,7 +57,7 @@ export default function HomePage() {
       </section>
 
       <section>
-        <SectionHeader title="Most Played Songs" />
+        <SectionHeader title="Most Played Songs" href="/songs"/>
         <ol className="flex flex-col gap-1 mt-3">
           {topSongs.map((song, index) => (
             <SongCard

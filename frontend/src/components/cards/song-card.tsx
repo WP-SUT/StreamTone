@@ -127,7 +127,7 @@ export default function SongCard({ song, index, queue }: SongCardProps) {
                 />
                 
                 {/* Menu dropdown */}
-                <div className="absolute right-0 top-6 bg-zinc-800 rounded-lg shadow-xl py-2 w-44 z-20 border border-zinc-700">
+                <div className="absolute right-0 bottom-8 bg-zinc-800 rounded-lg shadow-xl py-2 w-44 z-20 border border-zinc-700">
                   <button
                     onClick={handleAddToQueue}
                     className="w-full px-4 py-2 text-left text-sm text-white hover:bg-zinc-700 transition"
