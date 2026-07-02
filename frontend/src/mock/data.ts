@@ -4,6 +4,7 @@ export const mockUsers: User[] = [
   {
     id: "u1",
     displayName: "Soroush",
+    password: "11111111",
     email: "soroush@example.com",
     dateOfBirth: "1998-05-10",
     gender: "male",
@@ -21,6 +22,7 @@ export const mockArtists: Artist[] = [
   {
     id: "a1",
     artistName: "Dariush",
+    password: "11111111",
     email: "dariush@example.com",
     avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=dariush",
     bio: "Legendary Persian singer.",
