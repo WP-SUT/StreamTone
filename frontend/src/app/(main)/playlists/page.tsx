@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import PlaylistCard from "@/components/cards/playlist-card";
 import SectionHeader from "@/components/cards/section-header";
 import { usePlaylistStore } from "@/store/playlist-store";
-import CardList from "@/components/cards/card-list";
+import CardList from "@/components/cards/playlist-card-list";
 
 export default function PlaylistsPage() {
   const playlists = usePlaylistStore((state) => state.playlists);

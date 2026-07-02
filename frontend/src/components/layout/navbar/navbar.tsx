@@ -27,12 +27,6 @@ export function Navbar({ user }: NavbarProps) {
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false); // mobile search overlay
-
-  const closeAll = () => {
-    setDropdownOpen(false);
-    setNotifOpen(false);
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("user");

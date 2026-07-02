@@ -8,6 +8,8 @@ import AlbumCard from "@/components/cards/album-card";
 
 import GoldEarlyAccess from "@/components/home/gold-early-access";
 import SongCard from "@/components/cards/song-card";
+import CardList from "@/components/cards/playlist-card-list";
+import SongCardList from "@/components/cards/song-card-list";
 
 
 const currentUser = mockUsers[0];
@@ -58,7 +60,7 @@ export default function HomePage() {
 
       <section>
         <SectionHeader title="Most Played Songs" href="/songs"/>
-        <ol className="flex flex-col gap-1 mt-3">
+        <SongCardList>
           {topSongs.map((song, index) => (
             <SongCard
               key={song.id}
@@ -67,7 +69,7 @@ export default function HomePage() {
               queue={topSongs}
             />
           ))}
-        </ol>
+        </SongCardList>
       </section>
 
       <GoldEarlyAccess isGold={currentUser?.isPremium} />

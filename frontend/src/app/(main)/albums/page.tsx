@@ -1,7 +1,7 @@
 "use client"
 
 import AlbumCard from "@/components/cards/album-card";
-import CardList from "@/components/cards/card-list";
+import CardList from "@/components/cards/playlist-card-list";
 import SectionHeader from "@/components/cards/section-header";
 import { mockAlbums } from "@/mock/data";
 
