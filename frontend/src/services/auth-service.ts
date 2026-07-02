@@ -1,5 +1,5 @@
 import { storage } from "@/lib/storage";
-import { User, Artist, StaffUser, Gender } from "@/types/models";
+import { User, Artist, StaffUser, Gender, VerificationRequest } from "@/types/models";
 
 
 type Account = User | Artist | StaffUser;
@@ -65,4 +65,51 @@ export const authService = {
   logout(): void {
     storage.session.clear();
   },
+
+  async registerArtist(data: {
+  artistName: string;
+  email: string;
+  password: string;
+  portfolioUrls: string[];
+}): Promise<Artist> {
+  await new Promise((res) => setTimeout(res, 800));
+
+  // Check email uniqueness
+  if (storage.users.findByEmail(data.email) || storage.artists.findByEmail(data.email)) {
+    throw new Error("An account with this email already exists");
+  }
+
+  const newArtist: Artist = {
+    id: `a_${Date.now()}`,
+    artistName: data.artistName,
+    password: data.password,
+    email: data.email,
+    isVerified: false,
+    approvalStatus: "pending",
+    portfolioUrls: data.portfolioUrls,
+    followerCount: 0,
+    totalStreams: 0,
+    albumIds: [],
+    singleIds: [],
+    role: "artist",
+    createdAt: new Date().toISOString(),
+  };
+
+  storage.artists.upsert(newArtist);
+
+  // Create verification request
+  const verificationRequest: VerificationRequest = {
+    id: `vr_${Date.now()}`,
+    artistId: newArtist.id,
+    artistName: newArtist.artistName,
+    portfolioUrls: data.portfolioUrls,
+    status: "pending",
+    submittedAt: new Date().toISOString(),
+  };
+
+  // storage.verificationRequests.upsert(verificationRequest);
+
+  return newArtist;
+},
+
 };

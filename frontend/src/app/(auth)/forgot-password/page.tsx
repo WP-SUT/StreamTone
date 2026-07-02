@@ -7,7 +7,6 @@ import { z } from "zod";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AuthField } from "@/components/auth/auth-field";
