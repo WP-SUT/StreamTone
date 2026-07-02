@@ -42,50 +42,9 @@ export function Navbar({ user }: NavbarProps) {
   return (
     <header className="h-16 bg-zinc-900 border-b border-zinc-800 sticky top-0 z-40 flex items-center px-4 md:px-6 gap-3">
 
-      {/* ── Mobile search overlay ────────────────────── */}
-      {searchOpen && (
-        <div className="absolute inset-0 z-50 bg-zinc-900 flex items-center px-4 gap-3 md:hidden">
-          <Search className="w-4 h-4 text-zinc-400 shrink-0" />
-          <input
-            autoFocus
-            type="text"
-            placeholder="Search songs, artists, albums..."
-            className="flex-1 bg-transparent text-sm text-zinc-100 placeholder:text-zinc-500 outline-none"
-          />
-          <button
-            onClick={() => setSearchOpen(false)}
-            aria-label="Close search"
-            className="p-2 rounded-full hover:bg-zinc-800 transition"
-          >
-            <X className="w-5 h-5 text-zinc-400" />
-          </button>
-        </div>
-      )}
-
-      {/* ── Desktop search box ──────────────────────────────── */}
-      <div className="hidden md:flex items-center gap-2 bg-zinc-800 rounded-full px-4 py-2 w-72 focus-within:ring-2 focus-within:ring-zinc-600 transition">
-        <Search className="w-4 h-4 text-zinc-400 shrink-0" />
-        <input
-          type="text"
-          placeholder="Search songs, artists, albums..."
-          className="bg-transparent text-sm text-zinc-100 placeholder:text-zinc-500 outline-none w-full"
-        />
-      </div>
-
       {/* ── Spacer ──────────────────────────────── */}
       <div className="flex-1" />
-
-      {/* ── Right side ──────────────────────────────── */}
       <div className="flex items-center gap-1 sm:gap-3">
-
-        {/* Mobile search icon */}
-        <button
-          onClick={() => { setSearchOpen(true); closeAll(); }}
-          aria-label="Open search"
-          className="md:hidden p-2 rounded-full hover:bg-zinc-800 transition"
-        >
-          <Search className="w-5 h-5 text-zinc-300" />
-        </button>
 
         {/* Notifications */}
         <div className="relative">
