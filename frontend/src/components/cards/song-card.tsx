@@ -45,9 +45,9 @@ export default function SongCard({ song, index, queue }: SongCardProps) {
   return (
     <>
       <div
-        className={`group flex items-center gap-3 p-2 rounded-lg transition-colors hover:bg-white/5 ${
-          isCurrentlyPlaying ? "bg-white/10" : ""
-        }`}
+        className={`group flex items-center gap-3 p-2 rounded-lg transition-colors hover:bg-white/5 ${isCurrentlyPlaying ? "bg-white/10" : ""
+          }`}
+        onClick={handlePlay}
       >
         {/* Index or playing indicator */}
         {index !== undefined ? (
@@ -78,9 +78,8 @@ export default function SongCard({ song, index, queue }: SongCardProps) {
         {/* Title and artist */}
         <div className="flex-1 min-w-0">
           <h4
-            className={`text-sm font-medium truncate ${
-              isCurrentlyPlaying ? "text-primary" : "text-white"
-            }`}
+            className={`text-sm font-medium truncate ${isCurrentlyPlaying ? "text-primary" : "text-white"
+              }`}
           >
             {title}
           </h4>
@@ -100,14 +99,6 @@ export default function SongCard({ song, index, queue }: SongCardProps) {
           >
             <Heart size={16} />
           </button>
-          
-          <button
-            aria-label={`Play ${title}`}
-            onClick={handlePlay}
-            className="w-8 h-8 bg-primary rounded-full flex items-center justify-center hover:scale-110 transition-transform"
-          >
-            <Play size={14} fill="currentColor" />
-          </button>
 
           <div className="relative">
             <button
@@ -125,7 +116,7 @@ export default function SongCard({ song, index, queue }: SongCardProps) {
                   className="fixed inset-0 z-10"
                   onClick={() => setShowMenu(false)}
                 />
-                
+
                 {/* Menu dropdown */}
                 <div className="absolute right-0 bottom-8 bg-zinc-800 rounded-lg shadow-xl py-2 w-44 z-20 border border-zinc-700">
                   <button
