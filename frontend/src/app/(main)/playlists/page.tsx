@@ -17,7 +17,7 @@ export default function PlaylistsPage() {
   const playlists = playlistService.getByOwner(currentUser.id);
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <main className="flex flex-col gap-6 px-4 py-6 md:px-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <SectionHeader title="Playlists" />
@@ -56,6 +56,6 @@ export default function PlaylistsPage() {
         onClose={() => setShowCreateModal(false)}
         userId={currentUser.id}
       />
-    </div>
+    </main>
   );
 }

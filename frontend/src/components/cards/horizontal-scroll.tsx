@@ -19,7 +19,7 @@ export default function HorizontalScrollRow({
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group/scroll">
       {/* Left arrow */}
       <button
         onClick={() => scroll("left")}
@@ -28,8 +28,9 @@ export default function HorizontalScrollRow({
           hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10
           items-center justify-center
           w-8 h-8 rounded-full bg-black/70 text-white
-          opacity-0 group-hover:opacity-100 transition-opacity
+          opacity-0 group-hover/scroll:opacity-100 transition-opacity
           -translate-x-1/2
+          pointer-events-auto
         "
       >
         <ChevronLeft size={18} />
@@ -41,7 +42,9 @@ export default function HorizontalScrollRow({
         className="
           flex gap-3 sm:gap-4
           overflow-x-auto scroll-smooth
-          pb-2 scrollbar-hide
+          pb-2 py-3 px-3
+          scrollbar-hide
+          pointer-events-auto
         "
       >
         {children}
@@ -55,8 +58,9 @@ export default function HorizontalScrollRow({
           hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10
           items-center justify-center
           w-8 h-8 rounded-full bg-black/70 text-white
-          opacity-0 group-hover:opacity-100 transition-opacity
+          opacity-0 group-hover/scroll:opacity-100 transition-opacity
           translate-x-1/2
+          pointer-events-auto
         "
       >
         <ChevronRight size={18} />

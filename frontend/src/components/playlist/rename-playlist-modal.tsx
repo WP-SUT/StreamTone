@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { playlistService } from "@/services/playlist-service";
+import { Input } from "@/components/ui/input";
 
 interface RenamePlaylistModalProps {
   isOpen: boolean;
@@ -54,11 +55,10 @@ export function RenamePlaylistModal({
             <label className="block text-sm font-medium mb-2 text-zinc-300">
               New Name
             </label>
-            <input
+            <Input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-zinc-500 transition"
               autoFocus
             />
           </div>

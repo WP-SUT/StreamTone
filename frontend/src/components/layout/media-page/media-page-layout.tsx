@@ -35,7 +35,7 @@ export default function MediaPageLayout({
   children,
 }: MediaPageLayoutProps) {
   return (
-    <div className="p-4 md:p-6 space-y-5">
+    <main className="px-4 py-6 md:px-8 space-y-5">
       {/* Back */}
       <button
         onClick={onBack}
@@ -99,6 +99,6 @@ export default function MediaPageLayout({
           children
         )}
       </div>
-    </div>
+    </main>
   );
 }

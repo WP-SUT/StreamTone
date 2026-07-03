@@ -47,16 +47,6 @@ export default function PlaylistCard({
 
   const subtitle = (
     <>
-      {owner && ownerId ? (
-        <Link href={`/profile/${ownerId}`} className="hover:text-white hover:underline truncate">
-          {owner}
-        </Link>
-      ) : owner ? (
-        <span className="truncate">{owner}</span>
-      ) : null}
-
-      {owner && trackCount != null && <span className="shrink-0">·</span>}
-
       {trackCount != null && (
         <span className="shrink-0">
           {trackCount} {trackCount === 1 ? "track" : "tracks"}
