@@ -2,8 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { X, Plus, Check } from "lucide-react";
-import { usePlaylistStore } from "@/store/playlist-store";
 import { CreatePlaylistModal } from "./create-playlist-modal";
+import { storage } from "@/lib/storage";
+import { User } from "@/types/models";
+import { playlistService } from "@/services/playlist-service";
 
 interface AddToPlaylistModalProps {
   isOpen: boolean;
@@ -20,13 +22,8 @@ export function AddToPlaylistModal({
 }: AddToPlaylistModalProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const allPlaylists = usePlaylistStore((s) => s.playlists);
-  const addSongToPlaylist = usePlaylistStore((s) => s.addSongToPlaylist);
-
-  const userPlaylists = useMemo(
-    () => allPlaylists.filter((p) => p.ownerId === userId),
-    [allPlaylists, userId]
-  );
+  const currentUser = storage.session.get() as User;
+  const userPlaylists = playlistService.getByOwner(currentUser.id);
 
   if (!isOpen) return null;
 
@@ -65,7 +62,7 @@ export function AddToPlaylistModal({
                 return (
                   <button
                     key={playlist.id}
-                    onClick={() => addSongToPlaylist(playlist.id, songId)}
+                    onClick={() => playlistService.addSong(playlist.id,songId)}
                     disabled={alreadyAdded}
                     className="w-full flex items-center gap-3 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition"
                   >

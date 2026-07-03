@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { usePlaylistStore } from "@/store/playlist-store";
+import { playlistService } from "@/services/playlist-service";
 
 interface RenamePlaylistModalProps {
   isOpen: boolean;
@@ -17,9 +17,7 @@ export function RenamePlaylistModal({
   playlistId,
 }: RenamePlaylistModalProps) {
   const [title, setTitle] = useState("");
-  const renamePlaylist = usePlaylistStore((s) => s.renamePlaylist);
-  const getPlaylistById = usePlaylistStore((s) => s.getPlaylistById);
-
+  const getPlaylistById = playlistService.getById;
   useEffect(() => {
     if (isOpen) {
       const playlist = getPlaylistById(playlistId);
@@ -33,7 +31,7 @@ export function RenamePlaylistModal({
     e.preventDefault();
     if (!title.trim()) return;
 
-    renamePlaylist(playlistId, title.trim());
+    playlistService.rename(playlistId, title.trim());
     onClose();
   };
 

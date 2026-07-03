@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
-import { usePlaylistStore } from "@/store/playlist-store";
+import { playlistService } from "@/services/playlist-service";
 
 interface CreatePlaylistModalProps {
   isOpen: boolean;
@@ -17,8 +17,7 @@ export function CreatePlaylistModal({
   userId,
 }: CreatePlaylistModalProps) {
   const [title, setTitle] = useState("");
-  const [isPublic, setIsPublic] = useState(false);
-  const createPlaylist = usePlaylistStore((s) => s.createPlaylist);
+  
 
   if (!isOpen) return null;
 
@@ -26,9 +25,9 @@ export function CreatePlaylistModal({
     e.preventDefault();
     if (!title.trim()) return;
 
-    createPlaylist(title.trim(), userId, isPublic);
+    playlistService.create({ownerId: userId,title: title.trim()});
     setTitle("");
-    setIsPublic(false);
+    
     onClose();
   };
 
@@ -58,19 +57,6 @@ export function CreatePlaylistModal({
               className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               autoFocus
             />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="isPublic"
-              checked={isPublic}
-              onChange={(e) => setIsPublic(e.target.checked)}
-              className="w-4 h-4 accent-emerald-500"
-            />
-            <label htmlFor="isPublic" className="text-sm text-zinc-300">
-              Make this playlist public
-            </label>
           </div>
 
           <div className="flex gap-3 pt-2">

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Play, Music2, Plus } from "lucide-react";
 import { storage } from "@/lib/storage";
 import { usePlayerStore } from "@/store/player-store";
-import { usePlaylistStore } from "@/store/playlist-store";
+import { playlistService } from "@/services/playlist-service";
 
 interface PlaylistCardProps {
   id: string;
@@ -28,12 +28,11 @@ export default function PlaylistCard({
 }: PlaylistCardProps) {
   const destination = href ?? `/playlists/${id}`;
   const playSong = usePlayerStore((s) => s.playSong);
-  const getPlaylistById = usePlaylistStore((s) => s.getPlaylistById);
 
   const handlePlayPlaylist = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    const playlist = getPlaylistById(id);
+    const playlist = playlistService.getById(id);
     if (!playlist) return;
 
     const songs = storage.songs

@@ -1,8 +1,8 @@
 // src/components/playlist/delete-playlist-modal.tsx
 "use client";
 
+import { playlistService } from "@/services/playlist-service";
 import { X, AlertTriangle } from "lucide-react";
-import { usePlaylistStore } from "@/store/playlist-store";
 
 interface DeletePlaylistModalProps {
   isOpen: boolean;
@@ -15,15 +15,14 @@ export function DeletePlaylistModal({
   onClose,
   playlistId,
 }: DeletePlaylistModalProps) {
-  const deletePlaylist = usePlaylistStore((s) => s.deletePlaylist);
-  const getPlaylistById = usePlaylistStore((s) => s.getPlaylistById);
+  
 
   if (!isOpen) return null;
 
-  const playlist = getPlaylistById(playlistId);
+  const playlist = playlistService.getById(playlistId);
 
   const handleDelete = () => {
-    deletePlaylist(playlistId);
+    playlistService.delete(playlistId);
     onClose();
   };
 

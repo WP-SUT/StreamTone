@@ -5,11 +5,16 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PlaylistCard from "@/components/cards/playlist-card";
 import SectionHeader from "@/components/cards/section-header";
-import { usePlaylistStore } from "@/store/playlist-store";
 import CardList from "@/components/cards/playlist-card-list";
+import { storage } from "@/lib/storage";
+import { playlistService } from "@/services/playlist-service";
+import { User } from "@/types/models";
 
 export default function PlaylistsPage() {
-  const playlists = usePlaylistStore((state) => state.playlists);
+  
+  const currentUser = storage.session.get() as User;
+  const playlists = playlistService.getByOwner(currentUser.id);
+  
 
   return (
     <div className="flex flex-col gap-6 p-6">

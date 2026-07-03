@@ -3,7 +3,6 @@
 import { useParams, useRouter } from "next/navigation";
 import {MoreVertical } from "lucide-react";
 import { useState } from "react";
-import { usePlaylistStore } from "@/store/playlist-store";
 import { usePlayerStore } from "@/store/player-store";
 import { mockSongs } from "@/mock/data";
 import { RenamePlaylistModal } from "@/components/playlist/rename-playlist-modal";
@@ -11,6 +10,7 @@ import { DeletePlaylistModal } from "@/components/playlist/delete-playlist-modal
 import SongCard from "@/components/cards/song-card";
 import SongCardList from "@/components/cards/song-card-list";
 import MediaPageLayout from "@/components/layout/media-page/media-page-layout";
+import { playlistService } from "@/services/playlist-service";
 
 export default function PlaylistPage() {
   const params = useParams();
@@ -21,8 +21,7 @@ export default function PlaylistPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  const playlist = usePlaylistStore((s) => s.getPlaylistById(playlistId));
-  const removeSongFromPlaylist = usePlaylistStore((s) => s.removeSongFromPlaylist);
+  const playlist = playlistService.getById(playlistId);
   const { playSong } = usePlayerStore();
 
   if (!playlist) {
@@ -116,7 +115,7 @@ export default function PlaylistPage() {
               queue={playlistSongs}
               playlistId={playlist.id}
               onRemoveFromPlaylist={(songId) =>
-                removeSongFromPlaylist(playlist.id, songId)
+                playlistService.removeSong(playlistId,songId)
               }
             />
           ))}
