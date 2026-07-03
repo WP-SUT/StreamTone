@@ -1,13 +1,15 @@
 // ─── User roles ───────────────────────────────────────────
 export type UserRole = "listener" | "artist" | "support" | "admin";
+export type Gender = "male" | "female" | "other" | "prefer_not_to_say"
 
 // ─── Listener (ordinary user) ─────────────────────────────
 export interface User {
   id: string;
   displayName: string;
+  password: string;
   email: string;
   dateOfBirth: string;       // ISO date string
-  gender: "male" | "female" | "other" | "prefer_not_to_say";
+  gender: Gender;
   avatarUrl?: string;
   role: "listener";
   isPremium: boolean;
@@ -21,6 +23,7 @@ export interface User {
 export interface Artist {
   id: string;
   artistName: string;
+   password: string;
   email: string;
   avatarUrl?: string;
   bio?: string;
@@ -39,6 +42,7 @@ export interface Artist {
 export interface StaffUser {
   id: string;
   displayName: string;
+   password: string;
   email: string;
   role: "support" | "admin";
   avatarUrl?: string;
@@ -54,6 +58,7 @@ export interface Song {
   albumId?: string;
   coverUrl: string | undefined;
   audioUrl: string;
+  dominantColor: string;
   duration: number;          // seconds
   genre: string;
   releaseYear: number;
@@ -86,7 +91,6 @@ export interface Playlist {
   ownerId: string;           // User id
   coverUrl?: string;
   songIds: string[];
-  isPublic: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -140,13 +144,4 @@ export interface Subscription {
   isActive: boolean;
 }
 
-// ─── Player state (used in Zustand) ───────────────────────
-export interface PlayerState {
-  currentSong: Song | null;
-  queue: Song[];
-  isPlaying: boolean;
-  volume: number;            // 0–1
-  progress: number;          // seconds
-  repeatMode: "off" | "one" | "all";
-  isShuffle: boolean;
-}
+
