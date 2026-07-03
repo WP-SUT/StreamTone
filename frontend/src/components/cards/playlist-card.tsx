@@ -1,13 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { Music2 } from "lucide-react";
 import { storage } from "@/lib/storage";
 import { usePlayerStore } from "@/store/player-store";
 import { playlistService } from "@/services/playlist-service";
 import { PlayButton } from "@/components/ui/play-button";
 import { AddButton } from "@/components/ui/add-button";
+import MediaCard from "@/components/cards/media-card";
 
 interface PlaylistCardProps {
   id: string;
@@ -39,70 +38,41 @@ export default function PlaylistCard({
     if (songs.length > 0) playSong(songs[0], songs);
   };
 
-  return (
-    <div className="group flex flex-col gap-2 w-36 sm:w-40 md:w-44 shrink-0">
-      {/* Cover */}
-      <Link
-        href={destination}
-        className="relative block rounded-xl overflow-hidden aspect-square bg-neutral-800"
-      >
-        {cover ? (
-          <Image
-            src={cover}
-            alt={title}
-            fill
-            sizes="(max-width: 640px) 144px, (max-width: 768px) 160px, 176px"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-white/10">
-            <Music2 className="h-10 w-10 text-white/30" />
-          </div>
-        )}
+  const overlay = (
+    <>
+      <AddButton href="/albums-and-singles" ariaLabel={`Add songs to ${title}`} />
+      <PlayButton onClick={handlePlay} ariaLabel={`Play ${title}`} />
+    </>
+  );
 
-        {/* Button overlay */}
-        <div className="absolute inset-0 flex items-end justify-end p-2 gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
-          <AddButton
-            href="/albums-and-singles"
-            ariaLabel={`Add songs to ${title}`}/>
-          <PlayButton
-            onClick={handlePlay}
-            ariaLabel={`Play ${title}`}
-          />
-        </div>
-      </Link>
-
-      {/* Info */}
-      <div className="flex flex-col gap-0.5 px-0.5">
-        <Link
-          href={destination}
-          className="text-sm font-semibold text-white truncate hover:underline leading-tight"
-          title={title}
-        >
-          {title}
+  const subtitle = (
+    <>
+      {owner && ownerId ? (
+        <Link href={`/profile/${ownerId}`} className="hover:text-white hover:underline truncate">
+          {owner}
         </Link>
+      ) : owner ? (
+        <span className="truncate">{owner}</span>
+      ) : null}
 
-        <div className="flex items-center gap-1 text-xs text-neutral-400 truncate">
-          {owner && ownerId ? (
-            <Link
-              href={`/profile/${ownerId}`}
-              className="hover:text-white hover:underline truncate"
-            >
-              {owner}
-            </Link>
-          ) : owner ? (
-            <span className="truncate">{owner}</span>
-          ) : null}
+      {owner && trackCount != null && <span className="shrink-0">·</span>}
 
-          {owner && trackCount != null &&<span className="shrink-0">·</span>}
+      {trackCount != null && (
+        <span className="shrink-0">
+          {trackCount} {trackCount === 1 ? "track" : "tracks"}
+        </span>
+      )}
+    </>
+  );
 
-          {trackCount != null && (
-            <span className="shrink-0">
-              {trackCount} {trackCount === 1 ? "track" : "tracks"}
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
+  return (
+    <MediaCard
+      href={destination}
+      cover={cover}
+      coverAlt={title}
+      title={title}
+      overlay={overlay}
+      subtitle={subtitle}
+    />
   );
 }

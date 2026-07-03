@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
-import { Music2, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import { usePlayerStore } from "@/store/player-store";
 import { storage } from "@/lib/storage";
+import MediaCard from "@/components/cards/media-card";
 
 interface AlbumCardProps {
   id: string | number;
@@ -30,98 +30,58 @@ export default function AlbumCard({
 
   const handlePlayAlbum = (e: React.MouseEvent) => {
     e.preventDefault();
-    
     const album = storage.albums.findById(id.toString());
     if (!album) return;
-
-    const albumSongs = storage.songs
-      .getAll()
-      .filter((s) => album.trackIds.includes(s.id));
-
-    if (albumSongs.length > 0) {
-      playSong(albumSongs[0], albumSongs);
-    }
+    const albumSongs = storage.songs.getAll().filter((s) => album.trackIds.includes(s.id));
+    if (albumSongs.length > 0) playSong(albumSongs[0], albumSongs);
   };
 
-  return (
-    <div className="group flex flex-col gap-2 w-36 sm:w-40 md:w-44 shrink-0">
-      {/* Cover */}
-      <Link href={cardHref} className="relative block rounded-xl overflow-hidden aspect-square bg-neutral-800">
-        {cover ? (
-          <Image
-            src={cover}
-            alt={title}
-            fill
-            sizes="(max-width: 640px) 144px, (max-width: 768px) 160px, 176px"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          /* Fallback when no cover image */
-          <div className="flex h-full w-full items-center justify-center bg-white/10">
-            <Music2 className="h-10 w-10 text-white/30" />
-          </div>
-        )}
+  const overlay = (
+    <button
+      aria-label={`Play ${title}`}
+      onClick={handlePlayAlbum}
+      className="flex items-center justify-center w-9 h-9 rounded-full bg-primary text-white shadow-lg hover:scale-110 active:scale-95 transition-transform duration-150"
+    >
+      <Play size={16} fill="currentColor" />
+    </button>
+  );
 
-        {/* Play button overlay */}
-        <div
-          className="
-            absolute inset-0 flex items-end justify-end p-2
-            opacity-100 sm:opacity-0 sm:group-hover:opacity-100
-            transition-opacity duration-200
-          "
-        >
-          <button
-            aria-label={`Play ${title}`}
-            onClick={handlePlayAlbum}
-            className="
-              flex items-center justify-center
-              w-9 h-9 rounded-full
-              bg-primary text-white shadow-lg
-              hover:scale-110 active:scale-95
-              transition-transform duration-150
-            "
-          >
-            <Play size={16} fill="currentColor" />
-          </button>
-        </div>
-      </Link>
-
-      {/* Info */}
-      <div className="flex flex-col gap-0.5 px-0.5">
+  const subtitle = (
+    <>
+      {artistId ? (
         <Link
-          href={cardHref}
-          className="text-sm font-semibold text-white truncate hover:underline leading-tight"
-          title={title}
+          href={`/artists/${artistId}`}
+          className="hover:text-white hover:underline truncate"
         >
-          {title}
+          {artist}
         </Link>
+      ) : (
+        <span className="truncate">{artist}</span>
+      )}
+      {releaseYear && (
+        <>
+          <span className="shrink-0">·</span>
+          <span className="shrink-0">{releaseYear}</span>
+        </>
+      )}
+    </>
+  );
 
-        <div className="flex items-center gap-1 text-xs text-neutral-400 truncate">
-          {artistId ? (
-            <Link
-              href={`/artists/${artistId}`}
-              className="hover:text-white hover:underline truncate"
-            >
-              {artist}
-            </Link>
-          ) : (
-            <span className="truncate">{artist}</span>
-          )}
+  const extra = trackCount !== undefined ? (
+    <span className="text-xs text-neutral-500">
+      {trackCount} {trackCount === 1 ? "track" : "tracks"}
+    </span>
+  ) : undefined;
 
-          {releaseYear && (
-            <>
-              <span className="shrink-0">·</span>
-              <span className="shrink-0">{releaseYear}</span>
-            </>
-          )}
-        </div>
-
-        {trackCount !== undefined && (
-          <span className="text-xs text-neutral-500">
-            {trackCount} {trackCount === 1 ? "track" : "tracks"}
-          </span>
-        )}
-      </div>
-    </div>
+  return (
+    <MediaCard
+      href={cardHref}
+      cover={cover}
+      coverAlt={title}
+      title={title}
+      overlay={overlay}
+      subtitle={subtitle}
+      extra={extra}
+    />
   );
 }
