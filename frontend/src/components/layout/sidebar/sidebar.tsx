@@ -27,7 +27,6 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Home",href: "/home",             icon: Home,        roles: ["listener", "artist"] },
-  { label: "Search",           href: "/search",           icon: Search,      roles: ["listener", "artist"] },
   { label: "Playlists",        href: "/playlists",        icon: ListMusic,   roles: ["listener", "artist"] },
   { label: "Albums & Singles", href: "/albums-and-singles",           icon: Disc3,       roles: ["listener", "artist"] },
   { label: "Profile",          href: "/profile",          icon: User,        roles: ["listener", "artist"] },

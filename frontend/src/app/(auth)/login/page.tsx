@@ -16,6 +16,7 @@ import { AuthField } from "@/components/auth/auth-field";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import AuthHeader from "@/components/auth/Auth-Header";
 import { authService } from "@/services/auth-service";
+import { UserRole } from "@/types/models";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -23,8 +24,6 @@ const loginSchema = z.object({
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
-
-type UserRole = "listener" | "artist" | "admin" | "support";
 
 const roleRedirectMap: Record<UserRole, string> = {
   listener: "/home",

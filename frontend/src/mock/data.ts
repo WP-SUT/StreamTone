@@ -81,7 +81,7 @@ export const mockAlbums: Album[] = [
     coverUrl: "",
     releaseYear: 2022,
     genre: "Pop",
-    trackIds: ["s1,s2"],
+    trackIds: ["s1","s2"],
     totalDuration: 214,
     streamCount: 980000,
     createdAt: "2022-06-01T00:00:00Z",
@@ -95,7 +95,6 @@ export const mockPlaylists: Playlist[] = [
     ownerId: "u1",
     coverUrl: "",
     songIds: ["s1", "s2"],
-    isPublic: true,
     createdAt: "2024-02-01T00:00:00Z",
     updatedAt: "2024-02-01T00:00:00Z",
   }

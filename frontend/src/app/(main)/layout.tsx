@@ -38,6 +38,7 @@ export default function MainLayout({
     const storedUser = {
       id: "u1",
       displayName: "Soroush",
+      password: "11111111",
       email: "soroush@example.com",
       dateOfBirth: "1998-05-10",
       gender: "male",

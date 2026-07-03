@@ -8,15 +8,15 @@ import AlbumCard from "@/components/cards/album-card";
 
 import GoldEarlyAccess from "@/components/home/gold-early-access";
 import SongCard from "@/components/cards/song-card";
-import CardList from "@/components/cards/playlist-card-list";
 import SongCardList from "@/components/cards/song-card-list";
+import { storage } from "@/lib/storage";
 
 
 const currentUser = mockUsers[0];
 
 export default function HomePage() {
-  const recentPlaylists = mockPlaylists.slice(0, 8);
-  const latestAlbums = mockAlbums.slice(0, 8);
+  const recentPlaylists = storage.playlists.getAll();
+  const latestAlbums = storage.albums.getAll();
   const topSongs = mockSongs
     .slice()
     .sort((a, b) => (b.streamCount ?? 0) - (a.streamCount ?? 0))

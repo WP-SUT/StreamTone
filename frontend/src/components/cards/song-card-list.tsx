@@ -3,7 +3,7 @@ interface SongCardListProps {
 }
 
 export default function SongCardList({ children }: SongCardListProps) {
-    return <div className="flex flex-col gap-8 p-6">
+    return <div className="flex flex-col gap-1 mt-3">
         {children}
     </div>
 }

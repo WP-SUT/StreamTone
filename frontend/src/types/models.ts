@@ -91,7 +91,6 @@ export interface Playlist {
   ownerId: string;           // User id
   coverUrl?: string;
   songIds: string[];
-  isPublic: boolean;
   createdAt: string;
   updatedAt: string;
 }
