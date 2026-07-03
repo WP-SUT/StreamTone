@@ -13,7 +13,6 @@ interface MediaPageLayoutProps {
   metadata: React.ReactNode;
   onPlayAll: () => void;
   disablePlay?: boolean;
-  /** Extra action buttons placed after the play button (e.g. the ⋮ menu) */
   actions?: React.ReactNode;
   isEmpty: boolean;
   emptyMessage: string;
@@ -35,68 +34,73 @@ export default function MediaPageLayout({
   children,
 }: MediaPageLayoutProps) {
   return (
-    <div className="p-4 md:p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-5">
       {/* Back */}
       <button
         onClick={onBack}
-        className="text-zinc-400 hover:text-white transition"aria-label="Go back"
+        className="text-zinc-400 hover:text-white transition"
+        aria-label="Go back"
       >
-        <ArrowLeft size={24} />
+        <ArrowLeft size={22} />
       </button>
 
       {/* Cover + info */}
-      <div className="flex flex-col md:flex-row gap-6 items-start md:items-end">
-        <div className="w-40 h-40 md:w-48 md:h-48 rounded-lg shadow-2xl overflow-hidden flex items-center justify-center bg-zinc-800 flex-shrink-0">
+      <div className="flex flex-col md:flex-row gap-5 items-start md:items-end">
+        {/* Cover: w-32 h-32 on mobile, w-40 h-40 on desktop */}
+        <div className="w-32 h-32 md:w-40 md:h-40 rounded-md shadow-xl overflow-hidden flex items-center justify-center bg-zinc-800 flex-shrink-0">
           {coverUrl ? (
             <Image
               src={coverUrl}
               alt={coverAlt}
-              width={192}
-              height={192}
+              width={160}
+              height={160}
               className="w-full h-full object-cover"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-white/10">
-              <Music2 className="h-10 w-10 text-white/30" />
+              <Music2 className="h-8 w-8 text-white/30" />
             </div>
           )}
         </div>
 
-        <div className="flex-1 space-y-2 md:space-y-3">
-          <p className="text-xs md:text-sm font-semibold uppercase text-zinc-400">
+        <div className="flex-1 space-y-1.5 md:space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
             {label}
           </p>
-          <h1 className="text-3xl md:text-5xl font-bold break-words">{title}</h1>
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm md:text-base text-zinc-400">
+          <h1 className="text-2xl md:text-4xl font-bold break-words">{title}</h1>
+          {/* Metadata: smaller, muted */}
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs md:text-sm text-zinc-500">
             {metadata}
           </div>
         </div>
       </div>
 
       {/* Actions row */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <button
           aria-label="Play all"
           onClick={onPlayAll}
           disabled={disablePlay}
           className="
             flex items-center justify-center
-            w-12 h-12 md:w-14 md:h-14 rounded-full
-            bg-primary text-white shadow-lg
+            w-9 h-9 md:w-10 md:h-10 rounded-full
+            bg-primary text-white shadow-md
             hover:scale-110 active:scale-95
             disabled:bg-zinc-700 disabled:text-zinc-500 disabled:hover:scale-100
             transition-transform duration-150
           "
         >
-          <Play size={20} fill="currentColor" />
+          <Play size={15} fill="currentColor" />
         </button>
         {actions}
       </div>
 
       {/* Song list */}
-      <div className="space-y-2">
+      <div className="space-y-1">
         {isEmpty ? (
-          <div className="text-center py-12 text-zinc-400">{emptyMessage}</div>
+          <div className="text-center py-12 text-sm text-zinc-500">
+            {emptyMessage}
+          </div>
         ) : (
           children
         )}
