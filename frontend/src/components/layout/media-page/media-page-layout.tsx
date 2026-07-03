@@ -1,8 +1,9 @@
 "use client";
 
-import { ArrowLeft, Music2, Play } from "lucide-react";
+import { ArrowLeft, Music2 } from "lucide-react";
 import Image from "next/image";
 import React from "react";
+import { PlayButton } from "@/components/ui/play-button";
 
 interface MediaPageLayoutProps {
   onBack: () => void;
@@ -77,21 +78,14 @@ export default function MediaPageLayout({
 
       {/* Actions row */}
       <div className="flex items-center gap-3">
-        <button
-          aria-label="Play all"
+        <PlayButton
           onClick={onPlayAll}
-          disabled={disablePlay}
-          className="
-            flex items-center justify-center
-            w-9 h-9 md:w-10 md:h-10 rounded-full
-            bg-primary text-white shadow-md
-            hover:scale-110 active:scale-95
-            disabled:bg-zinc-700 disabled:text-zinc-500 disabled:hover:scale-100
-            transition-transform duration-150
-          "
-        >
-          <Play size={15} fill="currentColor" />
-        </button>
+          ariaLabel="Play all"
+          size={15}
+          className={`
+            w-9 h-9 md:w-10 md:h-10
+            ${disablePlay ? "bg-zinc-700 text-zinc-500hover:scale-100cursor-not-allowed" : ""}`}
+        />
         {actions}
       </div>
 

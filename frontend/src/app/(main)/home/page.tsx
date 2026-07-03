@@ -26,7 +26,7 @@ export default function HomePage() {
     <main className="flex flex-col gap-10 px-4 py-6 md:px-8 max-w-screen-xl mx-auto">
 
       <section>
-        <SectionHeader title="Latest Playlists" href="/playlists" />
+        <SectionHeader title="Latest Playlists" />
         <HorizontalScrollRow>
           {recentPlaylists.map((pl) => (
             <PlaylistCard
@@ -43,7 +43,7 @@ export default function HomePage() {
       </section>
 
       <section>
-        <SectionHeader title="Latest Albums" href="/albums" />
+        <SectionHeader title="Latest Albums" />
         <HorizontalScrollRow>
           {latestAlbums.map((album) => (
             <AlbumCard
@@ -59,7 +59,7 @@ export default function HomePage() {
       </section>
 
       <section>
-        <SectionHeader title="Most Played Songs" href="/songs"/>
+        <SectionHeader title="Most Played Tracks"/>
         <SongCardList>
           {topSongs.map((song, index) => (
             <SongCard

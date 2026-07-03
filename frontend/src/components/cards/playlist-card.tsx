@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Play, Music2, Plus } from "lucide-react";
+import { Music2 } from "lucide-react";
 import { storage } from "@/lib/storage";
 import { usePlayerStore } from "@/store/player-store";
 import { playlistService } from "@/services/playlist-service";
+import { PlayButton } from "@/components/ui/play-button";
+import { AddButton } from "@/components/ui/add-button";
 
 interface PlaylistCardProps {
   id: string;
@@ -29,25 +31,21 @@ export default function PlaylistCard({
   const destination = href ?? `/playlists/${id}`;
   const playSong = usePlayerStore((s) => s.playSong);
 
-  const handlePlayPlaylist = (e: React.MouseEvent) => {
+  const handlePlay = (e: React.MouseEvent) => {
     e.preventDefault();
-
     const playlist = playlistService.getById(id);
     if (!playlist) return;
-
-    const songs = storage.songs
-      .getAll()
-      .filter((s) => playlist.songIds.includes(s.id));
-
-    if (songs.length > 0) {
-      playSong(songs[0], songs);
-    }
+    const songs = storage.songs.getAll().filter((s) => playlist.songIds.includes(s.id));
+    if (songs.length > 0) playSong(songs[0], songs);
   };
 
   return (
     <div className="group flex flex-col gap-2 w-36 sm:w-40 md:w-44 shrink-0">
       {/* Cover */}
-      <Link href={destination} className="relative block rounded-xl overflow-hidden aspect-square bg-neutral-800">
+      <Link
+        href={destination}
+        className="relative block rounded-xl overflow-hidden aspect-square bg-neutral-800"
+      >
         {cover ? (
           <Image
             src={cover}
@@ -63,43 +61,14 @@ export default function PlaylistCard({
         )}
 
         {/* Button overlay */}
-        <div
-          className="
-            absolute inset-0 flex items-end justify-end p-2 gap-2
-            opacity-100 sm:opacity-0 sm:group-hover:opacity-100
-            transition-opacity duration-200
-          "
-        >
-          {/* Add button */}
-          <Link
+        <div className="absolute inset-0 flex items-end justify-end p-2 gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+          <AddButton
             href="/albums-and-singles"
-            aria-label={`Add songs to ${title}`}
-            onClick={(e) => e.stopPropagation()}
-            className="
-              flex items-center justify-center
-              w-9 h-9 rounded-full
-              bg-primary text-white shadow-lg
-              hover:scale-110 active:scale-95
-              transition-transform duration-150
-            "
-          >
-            <Plus size={16} />
-          </Link>
-
-          {/* Play button */}
-          <button
-            aria-label={`Play ${title}`}
-            onClick={handlePlayPlaylist}
-            className="
-              flex items-center justify-center
-              w-9 h-9 rounded-full
-              bg-primary text-white shadow-lg
-              hover:scale-110 active:scale-95
-              transition-transform duration-150
-            "
-          >
-            <Play size={16} fill="currentColor" />
-          </button>
+            ariaLabel={`Add songs to ${title}`}/>
+          <PlayButton
+            onClick={handlePlay}
+            ariaLabel={`Play ${title}`}
+          />
         </div>
       </Link>
 
@@ -125,12 +94,12 @@ export default function PlaylistCard({
             <span className="truncate">{owner}</span>
           ) : null}
 
-          {owner && trackCount != null && (
-            <span className="shrink-0">·</span>
-          )}
+          {owner && trackCount != null &&<span className="shrink-0">·</span>}
 
           {trackCount != null && (
-            <span className="shrink-0">{trackCount} {trackCount === 1 ? "track" : "tracks"}</span>
+            <span className="shrink-0">
+              {trackCount} {trackCount === 1 ? "track" : "tracks"}
+            </span>
           )}
         </div>
       </div>

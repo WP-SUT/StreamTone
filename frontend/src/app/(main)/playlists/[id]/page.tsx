@@ -1,16 +1,17 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import {MoreVertical } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { useState } from "react";
 import { usePlayerStore } from "@/store/player-store";
-import { mockSongs } from "@/mock/data";
+import { storage } from "@/lib/storage";
+import { playlistService } from "@/services/playlist-service";
 import { RenamePlaylistModal } from "@/components/playlist/rename-playlist-modal";
 import { DeletePlaylistModal } from "@/components/playlist/delete-playlist-modal";
 import SongCard from "@/components/cards/song-card";
 import SongCardList from "@/components/cards/song-card-list";
 import MediaPageLayout from "@/components/layout/media-page/media-page-layout";
-import { playlistService } from "@/services/playlist-service";
+import { AddButton } from "@/components/ui/add-button";
 
 export default function PlaylistPage() {
   const params = useParams();
@@ -38,7 +39,7 @@ export default function PlaylistPage() {
     );
   }
 
-  const playlistSongs = mockSongs.filter((s) => playlist.songIds.includes(s.id));
+  const playlistSongs = storage.songs.getAll().filter((s) => playlist.songIds.includes(s.id));
 
   const totalDuration = playlistSongs.reduce((acc, s) => acc + s.duration, 0);
   const formatTotalDuration = () => {
@@ -62,32 +63,40 @@ export default function PlaylistPage() {
   );
 
   const actions = (
-    <div className="relative">
-      <button
-        onClick={() => setShowMenu(!showMenu)}
-        className="w-10 h-10 text-zinc-400 hover:text-white transition flex items-center justify-center"
-      >
-        <MoreVertical size={24} />
-      </button>
-      {showMenu && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-          <div className="absolute top-12 left-0 bg-zinc-800 rounded-lg shadow-xl py-2 w-48 z-20 border border-zinc-700">
-            <button
-              onClick={() => { setShowRenameModal(true); setShowMenu(false); }}
-              className="w-full px-4 py-2 text-left text-sm hover:bg-zinc-700 transition"
-            >
-              Rename Playlist
-            </button>
-            <button
-              onClick={() => { setShowDeleteModal(true); setShowMenu(false); }}
-              className="w-full px-4 py-2 text-left text-sm hover:bg-zinc-700 text-red-400 transition"
-            >
-              Delete Playlist
-            </button>
-          </div>
-        </>
-      )}
+    <div className="flex items-center gap-2">
+      <AddButton
+        href="/albums-and-singles"
+        ariaLabel="Add songs to playlist"
+        className="w-9 h-9 md:w-10 md:h-10"
+      />
+      <div className="relative">
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="w-10 h-10 text-zinc-400 hover:text-white transition flex items-center justify-center"
+          aria-label="Playlist options"
+        >
+          <MoreVertical size={24} />
+        </button>
+        {showMenu && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+            <div className="absolute top-12 left-4 bg-zinc-800 rounded-lg shadow-xl py-2 w-48 z-20 border border-zinc-700">
+              <button
+                onClick={() => { setShowRenameModal(true); setShowMenu(false); }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-zinc-700 transition"
+              >
+                Rename Playlist
+              </button>
+              <button
+                onClick={() => { setShowDeleteModal(true); setShowMenu(false); }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-zinc-700 text-red-400 transition"
+              >
+                Delete Playlist
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 
@@ -115,12 +124,14 @@ export default function PlaylistPage() {
               queue={playlistSongs}
               playlistId={playlist.id}
               onRemoveFromPlaylist={(songId) =>
-                playlistService.removeSong(playlistId,songId)
+                playlistService.removeSong(playlistId, songId)
               }
             />
           ))}
         </SongCardList>
-      </MediaPageLayout><RenamePlaylistModal
+      </MediaPageLayout>
+      
+      <RenamePlaylistModal
         isOpen={showRenameModal}
         onClose={() => setShowRenameModal(false)}
         playlistId={playlist.id}
