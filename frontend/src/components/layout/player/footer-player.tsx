@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   Heart,
   SkipBack,
@@ -50,7 +50,6 @@ export default function FooterPlayer() {
     prev,
     seek,
     setVolume,
-    setProgress,
     toggleRepeat,
     toggleShuffle,
   } = usePlayerStore();
@@ -59,35 +58,10 @@ export default function FooterPlayer() {
   const [liked, setLiked] = useState(false);
   const [queueOpen, setQueueOpen] = useState(false);
   const [lyricsOpen, setLyricsOpen] = useState(false);
-  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const clicked = "hsl(263, 85%, 65%)";
   const accent = currentSong?.dominantColor ?? "hsl(263, 46%, 19%)";
   const bgColor = darken(accent, 0.55);
-
-  useEffect(() => {
-    if (isPlaying && duration > 0) {
-      tickRef.current = setInterval(() => {
-        setProgress(Math.min(progress + 1, duration));
-        if (progress >= duration - 1) {
-          if (repeatMode === "one") {
-            setProgress(0);
-          } else {
-            next();
-          }
-        }
-      }, 1000);
-    } else {
-      if (tickRef.current) clearInterval(tickRef.current);
-    }
-    return () => {
-      if (tickRef.current) clearInterval(tickRef.current);
-    };
-  }, [isPlaying, progress, duration, repeatMode, next, setProgress]);
-
-  useEffect(() => {
-    setProgress(0);
-  }, [currentSong?.id, setProgress]);
 
   const progressPercent = duration > 0 ? (progress / duration) * 100 : 0;
 
@@ -98,14 +72,24 @@ export default function FooterPlayer() {
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setVolume(Number(e.target.value) / 100);
-    setMuted(false);
+    const newVolume = Number(e.target.value) / 100;
+    setVolume(newVolume);
+    if (newVolume > 0) setMuted(false);
+  };
+
+  const handleMuteToggle = () => {
+    if (muted) {
+      setVolume(0.7);
+      setMuted(false);
+    } else {
+      setVolume(0);
+      setMuted(true);
+    }
   };
 
   const RepeatIcon = repeatMode === "one" ? Repeat1 : Repeat;
   const repeatActive = repeatMode !== "off";
 
-  // ── No song placeholder (desktop only) ────────────────────────────────────
   if (!currentSong) {
     return (
       <footer
@@ -217,21 +201,18 @@ export default function FooterPlayer() {
     </div>
   );
 
-  // ── Desktop-only footer ────────────────────────────────────────────────────
   return (
     <>
       <footer
         className="hidden md:flex fixed bottom-0 inset-x-0 z-50 text-white shadow-lg items-center gap-4 px-6 py-3"
         style={{ backgroundColor: bgColor }}
       >
-        {/* Left: cover + meta + like */}
         <div className="flex items-center gap-3 w-64 shrink-0">
           {Cover}
           {SongMeta}
           {LikeBtn}
         </div>
 
-        {/* Center: controls + progress */}
         <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
           <div className="flex items-center gap-3">
             <button
@@ -269,12 +250,11 @@ export default function FooterPlayer() {
           {ProgressBar}
         </div>
 
-        {/* Right: lyrics + queue + volume */}
         <div className="flex items-center gap-3 w-48 shrink-0 justify-end">
           {LyricsBtn}
           {QueueBtn}
           <button
-            onClick={() => setMuted((p) => !p)}
+            onClick={handleMuteToggle}
             aria-label={muted ? "Unmute" : "Mute"}
             className="p-1 text-white/70 hover:text-white transition"
           >

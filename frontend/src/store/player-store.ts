@@ -23,6 +23,9 @@ interface PlayerState {
   // Original queue (for shuffle)
   originalQueue: Song[];
   
+  // Audio element
+  audioElement: HTMLAudioElement | null;
+  
   // Actions
   playSong: (song: Song, queue?: Song[]) => void;
   play: () => void;
@@ -47,6 +50,9 @@ interface PlayerState {
   toggleRepeat: () => void;
   setRepeatMode: (mode: RepeatMode) => void;
   toggleShuffle: () => void;
+  
+  // Audio element initialization
+  initAudio: () => void;
 }
 
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -70,33 +76,106 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   repeatMode: 'off',
   isShuffle: false,
   originalQueue: [],
+  audioElement: null,
+  
+  // Initialize audio element (call this once from a top-level component)
+  initAudio: () => {
+    if (typeof window === 'undefined') return;
+    
+    const audio = new Audio();
+    audio.volume = get().volume;
+    
+    // Event listeners
+    audio.addEventListener('timeupdate', () => {
+      set({ progress: audio.currentTime });
+    });
+    
+    audio.addEventListener('durationchange', () => {
+      set({ duration: audio.duration });
+    });
+    
+    audio.addEventListener('ended', () => {
+      get().next();
+    });
+    
+    audio.addEventListener('play', () => {
+      set({ isPlaying: true });
+    });
+    
+    audio.addEventListener('pause', () => {
+      set({ isPlaying: false });
+    });
+    
+    audio.addEventListener('error', (e) => {
+      console.error('Audio playback error:', e);
+      set({ isPlaying: false });
+    });
+    
+    set({ audioElement: audio });
+  },
   
   // Play a song with optional queue
   playSong: (song, queue) => {
+    const { audioElement } = get();
+    
     const newQueue = queue || [song];
+    const currentIndex = newQueue.findIndex(s => s.id === song.id);
+    
     set({
       currentSong: song,
       queue: newQueue,
       originalQueue: newQueue,
-      currentIndex: newQueue.findIndex(s => s.id === song.id),
-      isPlaying: true,
+      currentIndex,
       progress: 0,
       duration: song.duration,
     });
+    
+    if (audioElement) {
+      audioElement.src = song.audioUrl;
+      audioElement.load();
+      audioElement.play().catch(error => {
+        console.error('Playback failed:', error);
+        set({ isPlaying: false });
+      });
+    }
   },
   
-  play: () => set({ isPlaying: true }),
+  play: () => {
+    const { audioElement } = get();
+    if (audioElement) {
+      audioElement.play().catch(error => {
+        console.error('Playback failed:', error);
+        set({ isPlaying: false });
+      });
+    }
+  },
   
-  pause: () => set({ isPlaying: false }),
+  pause: () => {
+    const { audioElement } = get();
+    if (audioElement) {
+      audioElement.pause();
+    }
+  },
   
-  togglePlayPause: () => set(state => ({ isPlaying: !state.isPlaying })),
+  togglePlayPause: () => {
+    const { isPlaying } = get();
+    if (isPlaying) {
+      get().pause();
+    } else {
+      get().play();
+    }
+  },
   
   next: () => {
     const { queue, currentIndex, repeatMode } = get();
     
     if (repeatMode === 'one') {
       // Restart current track
-      set({ progress: 0, isPlaying: true });
+      const { audioElement } = get();
+      if (audioElement) {
+        audioElement.currentTime = 0;
+        audioElement.play();
+      }
       return;
     }
     
@@ -104,35 +183,25 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     
     if (nextIndex < queue.length) {
       const nextSong = queue[nextIndex];
-      set({
-        currentIndex: nextIndex,
-        currentSong: nextSong,
-        progress: 0,
-        duration: nextSong.duration,
-        isPlaying: true,
-      });
+      get().playSong(nextSong, queue);
     } else if (repeatMode === 'all' && queue.length > 0) {
       // Loop back to start
       const firstSong = queue[0];
-      set({
-        currentIndex: 0,
-        currentSong: firstSong,
-        progress: 0,
-        duration: firstSong.duration,
-        isPlaying: true,
-      });
+      get().playSong(firstSong, queue);
     } else {
       // End of queue
-      set({ isPlaying: false });
+      get().pause();
     }
   },
   
   prev: () => {
-    const { queue, currentIndex, progress } = get();
+    const { queue, currentIndex, progress, audioElement } = get();
     
     // If more than 3 seconds into song, restart it
     if (progress > 3) {
-      set({ progress: 0 });
+      if (audioElement) {
+        audioElement.currentTime = 0;
+      }
       return;
     }
     
@@ -140,16 +209,12 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     
     if (prevIndex >= 0) {
       const prevSong = queue[prevIndex];
-      set({
-        currentIndex: prevIndex,
-        currentSong: prevSong,
-        progress: 0,
-        duration: prevSong.duration,
-        isPlaying: true,
-      });
+      get().playSong(prevSong, queue);
     } else {
-      // Already at start
-      set({ progress: 0 });
+      // Already at start - restart current song
+      if (audioElement) {
+        audioElement.currentTime = 0;
+      }
     }
   },
   
@@ -169,6 +234,12 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
       newIndex = currentIndex - 1;
     } else if (index === currentIndex) {
       newIndex = Math.min(currentIndex, newQueue.length - 1);
+      // Play next song if removing current
+      const nextSong = newQueue[newIndex];
+      if (nextSong) {
+        get().playSong(nextSong, newQueue);
+        return;
+      }
     }
     
     const newCurrentSong = newQueue[newIndex] || null;
@@ -182,6 +253,12 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   },
   
   clearQueue: () => {
+    const { audioElement } = get();
+    if (audioElement) {
+      audioElement.pause();
+      audioElement.src = '';
+    }
+    
     set({
       queue: [],
       originalQueue: [],
@@ -216,12 +293,25 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   },
   
   seek: (time) => {
-    const { duration } = get();
-    set({ progress: Math.max(0, Math.min(duration, time)) });
+    const { duration, audioElement } = get();
+    const newTime = Math.max(0, Math.min(duration, time));
+    
+    if (audioElement) {
+      audioElement.currentTime = newTime;
+    }
+    
+    set({ progress: newTime });
   },
   
   setVolume: (volume) => {
-    set({ volume: Math.max(0, Math.min(1, volume)) });
+    const clamped = Math.max(0, Math.min(1, volume));
+    const { audioElement } = get();
+    
+    if (audioElement) {
+      audioElement.volume = clamped;
+    }
+    
+    set({ volume: clamped });
   },
   
   setProgress: (progress) => {

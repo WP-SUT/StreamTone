@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Music2, Play } from "lucide-react";
+import { usePlayerStore } from "@/store/player-store";
+import { storage } from "@/lib/storage";
 
 interface AlbumCardProps {
   id: string | number;
@@ -24,6 +26,22 @@ export default function AlbumCard({
   href,
 }: AlbumCardProps) {
   const cardHref = href ?? `/albums/${id}`;
+  const playSong = usePlayerStore((s) => s.playSong);
+
+  const handlePlayAlbum = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    const album = storage.albums.findById(id.toString());
+    if (!album) return;
+
+    const albumSongs = storage.songs
+      .getAll()
+      .filter((s) => album.trackIds.includes(s.id));
+
+    if (albumSongs.length > 0) {
+      playSong(albumSongs[0], albumSongs);
+    }
+  };
 
   return (
     <div className="group flex flex-col gap-2 w-36 sm:w-40 md:w-44 shrink-0">
@@ -54,10 +72,7 @@ export default function AlbumCard({
         >
           <button
             aria-label={`Play ${title}`}
-            onClick={(e) => {
-              e.preventDefault();
-              // TODO: dispatch play action for this album
-            }}
+            onClick={handlePlayAlbum}
             className="
               flex items-center justify-center
               w-9 h-9 rounded-full

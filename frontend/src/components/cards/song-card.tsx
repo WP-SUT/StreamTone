@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Play, MoreHorizontal } from "lucide-react";
+import { Heart, Play, MoreHorizontal, Music2 } from "lucide-react";
 import { usePlayerStore } from "@/store/player-store";
 import { Song } from "@/types/models";
 import { useState } from "react";
@@ -62,9 +62,8 @@ export default function SongCard({
   return (
     <>
       <div
-        className={`group flex items-center gap-3 p-2 rounded-lg transition-colors hover:bg-white/5 cursor-pointer ${
-          isCurrentlyPlaying ? "bg-white/10" : ""
-        }`}
+        className={`group flex items-center gap-3 p-2 rounded-lg transition-colors hover:bg-white/5 cursor-pointer ${isCurrentlyPlaying ? "bg-white/10" : ""
+          }`}
         onClick={handlePlay}
       >
         {/* Index or playing indicator */}
@@ -80,21 +79,26 @@ export default function SongCard({
 
         {/* Album cover */}
         <div className="relative flex-shrink-0 w-10 h-10">
-          <Image
-            src={coverUrl as string}
-            alt={`${title} cover`}
-            width={40}
-            height={40}
-            className="rounded object-cover"
-          />
+          {coverUrl ? (
+            <Image
+              src={coverUrl}
+              alt={title}
+              fill
+              sizes="(max-width: 640px) 144px, (max-width: 768px) 160px, 176px"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full p-3 items-center justify-center bg-white/10">
+              <Music2 className="h-10 w-10 text-white/30" />
+            </div>
+          )}
         </div>
 
         {/* Title, artist, and album */}
         <div className="flex-1 min-w-0">
           <h4
-            className={`text-sm font-medium truncate ${
-              isCurrentlyPlaying ? "text-primary" : "text-white"
-            }`}
+            className={`text-sm font-medium truncate ${isCurrentlyPlaying ? "text-primary" : "text-white"
+              }`}
           >
             {title}
           </h4>
