@@ -47,7 +47,7 @@ export const mockSongs: Song[] = [
     albumId: "alb1",
     coverUrl: "/cover/Dariush-Boghz.jpg",
     audioUrl: "/music/Dariush - Boghz.mp3",
-    dominantColor: "brown",
+    dominantColor: "red",
     duration: 511,
     genre: "Pop",
     releaseYear: 2022,

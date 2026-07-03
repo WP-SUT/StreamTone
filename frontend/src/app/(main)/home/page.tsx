@@ -1,6 +1,5 @@
 "use client"
 
-import { mockAlbums, mockPlaylists, mockSongs, mockUsers } from "@/mock/data";
 import SectionHeader from "@/components/cards/section-header";
 import HorizontalScrollRow from "@/components/cards/horizontal-scroll";
 import PlaylistCard from "@/components/cards/playlist-card";
@@ -17,9 +16,11 @@ import { User } from "@/types/models";
 
 
 export default function HomePage() {
+  
   const currentUser = storage.session.get() as User;
   const recentPlaylists = playlistService.getByOwner(currentUser?.id);
   const latestAlbums = storage.albums.getAll();
+
   const topSongs = storage.songs.getAll()
     .slice()
     .sort((a, b) => (b.streamCount ?? 0) - (a.streamCount ?? 0))

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home, Search, ListMusic, Disc3, User, Settings,
+  Home, ListMusic, Disc3, User, Settings,
   TicketCheck, UserCheck, ChevronLeft, ChevronRight, ShieldCheck,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";

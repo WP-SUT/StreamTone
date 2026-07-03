@@ -17,7 +17,6 @@ export function CreatePlaylistModal({
   userId,
 }: CreatePlaylistModalProps) {
   const [title, setTitle] = useState("");
-  
 
   if (!isOpen) return null;
 
@@ -25,17 +24,16 @@ export function CreatePlaylistModal({
     e.preventDefault();
     if (!title.trim()) return;
 
-    playlistService.create({ownerId: userId,title: title.trim()});
+    playlistService.create({ ownerId: userId, title: title.trim() });
     setTitle("");
-    
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-zinc-900 rounded-lg w-full max-w-md p-6 shadow-2xl">
+      <div className="glass rounded-lg w-full max-w-md p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold">Create Playlist</h2>
+          <h2 className="text-xl font-bold text-gradient">Create Playlist</h2>
           <button
             onClick={onClose}
             className="text-zinc-400 hover:text-white transition"
@@ -46,7 +44,7 @@ export function CreatePlaylistModal({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2 text-zinc-300">
               Playlist Name
             </label>
             <input
@@ -54,7 +52,7 @@ export function CreatePlaylistModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="My Awesome Playlist"
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-zinc-500 transition"
               autoFocus
             />
           </div>
@@ -63,14 +61,14 @@ export function CreatePlaylistModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition"
+              className="flex-1 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-700/50 rounded-lg transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!title.trim()}
-              className="flex-1 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-zinc-700 disabled:text-zinc-500 rounded-lg transition font-medium"
+              className="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 disabled:bg-zinc-700/50 disabled:text-zinc-500 rounded-lg transition font-medium glow-primary"
             >
               Create
             </button>

@@ -2,12 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Play, MoreHorizontal, Music2 } from "lucide-react";
+import { Heart, Play, MoreHorizontal, Music2, ListPlus, ListX, ListEnd } from "lucide-react";
 import { usePlayerStore } from "@/store/player-store";
 import { Song } from "@/types/models";
 import { useState } from "react";
 import { AddToPlaylistModal } from "@/components/playlist/add-to-playlist-modal";
 import { storage } from "@/lib/storage";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 interface SongCardProps {
   song: Song;
@@ -24,7 +31,6 @@ export default function SongCard({
   playlistId,
   onRemoveFromPlaylist,
 }: SongCardProps) {
-  const [showMenu, setShowMenu] = useState(false);
   const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
 
   const playSong = usePlayerStore((state) => state.playSong);
@@ -40,13 +46,11 @@ export default function SongCard({
 
   const handleAddToQueue = () => {
     addToQueue(song);
-    setShowMenu(false);
   };
 
   const handleRemoveFromPlaylist = () => {
     if (onRemoveFromPlaylist) {
       onRemoveFromPlaylist(song.id);
-      setShowMenu(false);
     }
   };
 
@@ -68,7 +72,7 @@ export default function SongCard({
       >
         {/* Index or playing indicator */}
         {index !== undefined ? (
-          <span className="w-4 text-sm text-gray-400 text-center flex-shrink-0">
+          <span className="w-4 text-sm text-gray-400text-center flex-shrink-0">
             {isCurrentlyPlaying ? (
               <Play size={12} className="text-primary ml-auto" fill="currentColor" />
             ) : (
@@ -132,54 +136,46 @@ export default function SongCard({
             className="text-gray-400 hover:text-white transition-colors"
           >
             <Heart size={16} />
-          </button>
+          </button><DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label="More options"
+                onClick={(e) => e.stopPropagation()}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <MoreHorizontal size={16} />
+              </button>
+            </DropdownMenuTrigger>
 
-          <div className="relative">
-            <button
-              aria-label="More options"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowMenu(!showMenu);
-              }}
-              className="text-gray-400 hover:text-white transition-colors"
+            <DropdownMenuContent
+              align="end"
+              side="bottom"
+              className="glass border-zinc-700/30min-w-44"
             >
-              <MoreHorizontal size={16} />
-            </button>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleAddToQueue; }}>
+                <ListEnd size={14} />
+                Add to Queue
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => { e.stopPropagation(); setShowAddToPlaylist(true); }}
+              >
+                <ListPlus size={14} />
+                Add to Playlist
+              </DropdownMenuItem>
 
-            {showMenu && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setShowMenu(false)}
-                />
-                <div className="absolute right-0 bottom-8 bg-zinc-800 rounded-lg shadow-xl py-2 w-44 z-20 border border-zinc-700">
-                  <button
-                    onClick={handleAddToQueue}
-                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-zinc-700 transition"
-                  >
-                    Add to Queue
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowAddToPlaylist(true);
-                      setShowMenu(false);
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-zinc-700 transition"
-                  >
-                    Add to Playlist
-                  </button>
-                  {playlistId && onRemoveFromPlaylist && (
-                    <button
-                      onClick={handleRemoveFromPlaylist}
-                      className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-zinc-700 transition"
-                    >
-                      Remove from Playlist
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
+              {playlistId && onRemoveFromPlaylist && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={(e) => { e.stopPropagation(); handleRemoveFromPlaylist; }}>
+                    <ListX size={14} />
+                    Remove from Playlist
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

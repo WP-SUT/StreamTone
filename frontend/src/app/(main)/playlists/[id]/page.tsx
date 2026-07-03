@@ -12,6 +12,13 @@ import SongCard from "@/components/cards/song-card";
 import SongCardList from "@/components/cards/song-card-list";
 import MediaPageLayout from "@/components/layout/media-page/media-page-layout";
 import { AddButton } from "@/components/ui/add-button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 export default function PlaylistPage() {
   const params = useParams();
@@ -20,7 +27,6 @@ export default function PlaylistPage() {
 
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
 
   const playlist = playlistService.getById(playlistId);
   const { playSong } = usePlayerStore();
@@ -69,34 +75,37 @@ export default function PlaylistPage() {
         ariaLabel="Add songs to playlist"
         className="w-9 h-9 md:w-10 md:h-10"
       />
-      <div className="relative">
-        <button
-          onClick={() => setShowMenu(!showMenu)}
-          className="w-10 h-10 text-zinc-400 hover:text-white transition flex items-center justify-center"
-          aria-label="Playlist options"
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className="w-10 h-10 text-zinc-400 hover:text-white transition flex items-center justify-center"
+            aria-label="Playlist options"
+          >
+            <MoreVertical size={24} />
+          </button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent
+          align="end"
+          side="bottom"
+          sideOffset={8}
+          alignOffset={-8}
+          collisionPadding={16}
+          className="glass border-zinc-700/30 min-w-44 z-50"
         >
-          <MoreVertical size={24} />
-        </button>
-        {showMenu && (
-          <>
-            <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-            <div className="absolute top-12 left-4 bg-zinc-800 rounded-lg shadow-xl py-2 w-48 z-20 border border-zinc-700">
-              <button
-                onClick={() => { setShowRenameModal(true); setShowMenu(false); }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-zinc-700 transition"
-              >
-                Rename Playlist
-              </button>
-              <button
-                onClick={() => { setShowDeleteModal(true); setShowMenu(false); }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-zinc-700 text-red-400 transition"
-              >
-                Delete Playlist
-              </button>
-            </div>
-          </>
-        )}
-      </div>
+          <DropdownMenuItem onClick={() => setShowRenameModal(true)}>
+            Rename Playlist
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={() => setShowDeleteModal(true)}
+          >
+            Delete Playlist
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 
@@ -130,7 +139,7 @@ export default function PlaylistPage() {
           ))}
         </SongCardList>
       </MediaPageLayout>
-      
+
       <RenamePlaylistModal
         isOpen={showRenameModal}
         onClose={() => setShowRenameModal(false)}

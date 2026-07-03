@@ -8,7 +8,8 @@ import { Navbar } from "@/components/layout/navbar/navbar";
 import FooterPlayer from "@/components/layout/player/footer-player";
 
 import type { User, Artist, StaffUser } from "@/types/models";
-import MiniPlayer from "@/components/player/mini-player";
+import MiniPlayer from "@/components/layout/player/mini-player";
+import { storage } from "@/lib/storage";
 
 // Any logged-in user can be one of these three shapes
 type AuthedUser = User | Artist | StaffUser;
@@ -35,21 +36,7 @@ export default function MainLayout({
 
   // Auth guard
   useEffect(() => {
-    const storedUser = {
-      id: "u1",
-      displayName: "Soroush",
-      password: "11111111",
-      email: "soroush@example.com",
-      dateOfBirth: "1998-05-10",
-      gender: "male",
-      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=soroush",
-      role: "artist",
-      isPremium: false,
-      followingArtistIds: ["a1"],
-      followerIds: [],
-      playlistIds: ["pl1"],
-      createdAt: "2024-01-01T00:00:00Z",
-    };
+    const storedUser = storage.session.get();
     if (!storedUser) {
       router.push("/login");
       return;
@@ -91,9 +78,7 @@ export default function MainLayout({
           {children}
         </main>
       </div>
-      <MiniPlayer
-        onExpand={() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })}
-      />
+      <MiniPlayer />
       <FooterPlayer />
     </div>
   );
