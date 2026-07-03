@@ -6,6 +6,7 @@ export type Gender = "male" | "female" | "other" | "prefer_not_to_say"
 export interface User {
   id: string;
   displayName: string;
+  username: string;
   password: string;
   email: string;
   dateOfBirth: string;       // ISO date string
@@ -13,6 +14,9 @@ export interface User {
   avatarUrl?: string;
   role: "listener";
   isPremium: boolean;
+  subscriptionTier: "gold" | "silver" | "basic";
+  dailyStreamCount: number;
+  followingUserIds: string[];
   followingArtistIds: string[];
   followerIds: string[];
   playlistIds: string[];
@@ -143,5 +147,6 @@ export interface Subscription {
   endDate?: string;
   isActive: boolean;
 }
+
 
 

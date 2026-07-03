@@ -43,13 +43,13 @@ export default function MediaCard({
               <Music2 className="h-10 w-10 text-white/30" />
             </div>
           )}
-
-          {overlay && (
-            <div className="absolute inset-0 flex items-end justify-end p-2 gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
-              {overlay}
-            </div>
-          )}
         </Link>
+
+        {overlay && (
+          <div className="absolute inset-0 z-10 flex items-end justify-end gap-2 p-2 opacity-100 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100">
+            {overlay}
+          </div>
+        )}
       </Card>
 
       {/* Info */}
