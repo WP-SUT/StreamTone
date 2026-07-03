@@ -10,14 +10,17 @@ import GoldEarlyAccess from "@/components/home/gold-early-access";
 import SongCard from "@/components/cards/song-card";
 import SongCardList from "@/components/cards/song-card-list";
 import { storage } from "@/lib/storage";
+import { playlistService } from "@/services/playlist-service";
+import { User } from "@/types/models";
 
 
-const currentUser = mockUsers[0];
+
 
 export default function HomePage() {
-  const recentPlaylists = storage.playlists.getAll();
+  const currentUser = storage.session.get() as User;
+  const recentPlaylists = playlistService.getByOwner(currentUser?.id);
   const latestAlbums = storage.albums.getAll();
-  const topSongs = mockSongs
+  const topSongs = storage.songs.getAll()
     .slice()
     .sort((a, b) => (b.streamCount ?? 0) - (a.streamCount ?? 0))
     .slice(0, 10);
@@ -25,8 +28,9 @@ export default function HomePage() {
   return (
     <main className="flex flex-col gap-10 px-4 py-6 md:px-8 max-w-screen-xl mx-auto">
 
+      {recentPlaylists.length!==0 && 
       <section>
-        <SectionHeader title="Latest Playlists" />
+        <SectionHeader title="Recent Playlists" />
         <HorizontalScrollRow>
           {recentPlaylists.map((pl) => (
             <PlaylistCard
@@ -41,6 +45,7 @@ export default function HomePage() {
           ))}
         </HorizontalScrollRow>
       </section>
+      }
 
       <section>
         <SectionHeader title="Latest Albums" />
