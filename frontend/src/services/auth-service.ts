@@ -11,7 +11,7 @@ export const authService = {
     // Check artists
     const artist = storage.artists.findByEmail(email);
     if (artist) {
-      if (password !== "") throw new Error("Invalid credentials");
+      //if (password !== "") throw new Error("Invalid credentials");
       storage.session.set(artist);
       return artist;
     }
