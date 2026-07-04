@@ -1,4 +1,4 @@
-import type { User, Artist, Song, Album, Playlist, StaffUser, Ticket } from "@/types/models";
+import type { User, Artist, Song, Album, Playlist, StaffUser, Ticket, VerificationRequest, ArtistSettlement, SubscriptionPricing } from "@/types/models";
 import {
   mockUsers,
   mockArtists,
@@ -8,6 +8,9 @@ import {
 } from "@/mock/data";
 import { mockStaff } from "@/mock/staff";
 import { mockTickets } from "@/mock/tickets";
+import { mockVerifications } from "@/mock/verifications";
+import { mockSettlements } from "@/mock/settlements";
+import { mockPricing } from "@/mock/pricing";
 
 const KEYS = {
   USERS: "app_users",
@@ -17,6 +20,9 @@ const KEYS = {
   ALBUMS: "app_albums",
   PLAYLISTS: "app_playlists",
   TICKETS: "app_tickets",
+  VERIFICATIONS: "app_verifications",
+  SETTLEMENTS: "app_settlements",
+  PRICING: "app_pricing",
   SESSION: "app_session",
 } as const;
 
@@ -41,7 +47,7 @@ function remove(key: string): void {
   localStorage.removeItem(key);
 }
 
-const STORAGE_VERSION = "2";
+const STORAGE_VERSION = "3";
 
 export function initStorage(): void {
   if (typeof window === "undefined") return;
@@ -51,6 +57,9 @@ export function initStorage(): void {
     // Re-seed collections added after initial project setup
     if (!localStorage.getItem(KEYS.STAFF)) set(KEYS.STAFF, mockStaff);
     if (!localStorage.getItem(KEYS.TICKETS)) set(KEYS.TICKETS, mockTickets);
+    if (!localStorage.getItem(KEYS.VERIFICATIONS)) set(KEYS.VERIFICATIONS, mockVerifications);
+    if (!localStorage.getItem(KEYS.SETTLEMENTS)) set(KEYS.SETTLEMENTS, mockSettlements);
+    if (!localStorage.getItem(KEYS.PRICING)) set(KEYS.PRICING, mockPricing);
     localStorage.setItem("app_storage_version", STORAGE_VERSION);
   }
 
@@ -61,6 +70,9 @@ export function initStorage(): void {
   if (!localStorage.getItem(KEYS.ALBUMS)) set(KEYS.ALBUMS, mockAlbums);
   if (!localStorage.getItem(KEYS.PLAYLISTS)) set(KEYS.PLAYLISTS, mockPlaylists);
   if (!localStorage.getItem(KEYS.TICKETS)) set(KEYS.TICKETS, mockTickets);
+  if (!localStorage.getItem(KEYS.VERIFICATIONS)) set(KEYS.VERIFICATIONS, mockVerifications);
+  if (!localStorage.getItem(KEYS.SETTLEMENTS)) set(KEYS.SETTLEMENTS, mockSettlements);
+  if (!localStorage.getItem(KEYS.PRICING)) set(KEYS.PRICING, mockPricing);
 }
 
 export const storage = {
@@ -214,6 +226,50 @@ export const storage = {
       if (idx === -1) all.push(ticket);
       else all[idx] = ticket;
       this.setAll(all);
+    },
+  },
+
+  verifications: {
+    getAll(): VerificationRequest[] {
+      return get<VerificationRequest[]>(KEYS.VERIFICATIONS, []);
+    },
+    setAll(items: VerificationRequest[]): void {
+      set(KEYS.VERIFICATIONS, items);
+    },
+    findById(id: string): VerificationRequest | undefined {
+      return this.getAll().find((v) => v.id === id);
+    },
+    upsert(item: VerificationRequest): void {
+      const all = this.getAll();
+      const idx = all.findIndex((v) => v.id === item.id);
+      if (idx === -1) all.push(item);
+      else all[idx] = item;
+      this.setAll(all);
+    },
+  },
+
+  settlements: {
+    getAll(): ArtistSettlement[] {
+      return get<ArtistSettlement[]>(KEYS.SETTLEMENTS, []);
+    },
+    setAll(items: ArtistSettlement[]): void {
+      set(KEYS.SETTLEMENTS, items);
+    },
+    upsert(item: ArtistSettlement): void {
+      const all = this.getAll();
+      const idx = all.findIndex((s) => s.id === item.id);
+      if (idx === -1) all.push(item);
+      else all[idx] = item;
+      this.setAll(all);
+    },
+  },
+
+  pricing: {
+    get(): SubscriptionPricing {
+      return get<SubscriptionPricing>(KEYS.PRICING, mockPricing);
+    },
+    set(pricing: SubscriptionPricing): void {
+      set(KEYS.PRICING, pricing);
     },
   },
 

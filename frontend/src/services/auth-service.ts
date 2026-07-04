@@ -102,7 +102,6 @@ export const authService = {
 
   storage.artists.upsert(newArtist);
 
-  // Create verification request
   const verificationRequest: VerificationRequest = {
     id: `vr_${Date.now()}`,
     artistId: newArtist.id,
@@ -112,7 +111,7 @@ export const authService = {
     submittedAt: new Date().toISOString(),
   };
 
-  // storage.verificationRequests.upsert(verificationRequest);
+  storage.verifications.upsert(verificationRequest);
 
   return newArtist;
 },
