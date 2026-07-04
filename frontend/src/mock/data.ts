@@ -36,6 +36,23 @@ export const mockArtists: Artist[] = [
     role: "artist",
     createdAt: "2023-01-01T00:00:00Z",
   },
+  {
+    id: "a2",
+    artistName: "Pending Artist",
+    password: "11111111",
+    email: "pending@example.com",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=pending",
+    bio: "New artist awaiting verification.",
+    isVerified: false,
+    approvalStatus: "pending",
+    portfolioUrls: ["https://example.com/sample1.mp3"],
+    followerCount: 0,
+    totalStreams: 0,
+    albumIds: [],
+    singleIds: [],
+    role: "artist",
+    createdAt: "2026-06-01T00:00:00Z",
+  },
 ];
 
 export const mockSongs: Song[] = [

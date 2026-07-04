@@ -8,15 +8,20 @@ export const authService = {
   async login(email: string, password: string): Promise<Account> {
     await new Promise((res) => setTimeout(res, 800));
 
-    // Check artists
+    const staff = storage.staff.findByEmail(email);
+    if (staff) {
+      if (password !== staff.password) throw new Error("Invalid credentials");
+      storage.session.set(staff);
+      return staff;
+    }
+
     const artist = storage.artists.findByEmail(email);
     if (artist) {
-      if (password !== "") throw new Error("Invalid credentials");
+      if (password !== artist.password) throw new Error("Invalid credentials");
       storage.session.set(artist);
       return artist;
     }
 
-    // Check users (mock seed + any registered via this session)
     const user = storage.users.findByEmail(email);
     if (user) {
       if (password !== user.password) throw new Error("Invalid credentials");

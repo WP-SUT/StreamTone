@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home, ListMusic, Disc3, User, Settings,
+  Home, ListMusic, Disc3, User, Settings, LayoutDashboard,
   TicketCheck, UserCheck, ChevronLeft, ChevronRight, ShieldCheck,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
@@ -32,9 +32,11 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Profile",          href: "/profile",          icon: User,        roles: ["listener", "artist"] },
   { label: "Settings",         href: "/settings",         icon: Settings,    roles: ["listener", "artist"] },
 
+  { label: "Dashboard",        href: "/support/dashboard", icon: LayoutDashboard, roles: ["support"] },
   { label: "Tickets",          href: "/support/tickets",  icon: TicketCheck, roles: ["support"] },
   { label: "Settings",         href: "/settings",         icon: Settings,    roles: ["support"] },
 
+  { label: "Dashboard",        href: "/admin/dashboard",  icon: LayoutDashboard, roles: ["admin"] },
   { label: "Tickets",          href: "/admin/tickets",    icon: TicketCheck, roles: ["admin"] },
   { label: "Artist Approvals", href: "/admin/approvals",  icon: UserCheck,   roles: ["admin"] },
   { label: "Management",       href: "/admin/management", icon: ShieldCheck, roles: ["admin"] },

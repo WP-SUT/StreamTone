@@ -56,6 +56,8 @@ export default function MainLayout({
     );
   }
 
+  const isStaff = user.role === "admin" || user.role === "support";
+
   return (
     <div className="h-screen bg-zinc-950 text-white flex overflow-hidden">
       <Sidebar
@@ -74,12 +76,12 @@ export default function MainLayout({
           }}
         />
 
-        <main className="flex-1 overflow-y-auto pb-20">
+        <main className={`flex-1 overflow-y-auto ${isStaff ? "pb-6" : "pb-20"}`}>
           {children}
         </main>
       </div>
-      <MiniPlayer />
-      <FooterPlayer />
+      {!isStaff && <MiniPlayer />}
+      {!isStaff && <FooterPlayer />}
     </div>
   );
 }

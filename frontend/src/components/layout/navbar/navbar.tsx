@@ -13,6 +13,7 @@ import {
   LogOut,
   X,
 } from "lucide-react";
+import { authService } from "@/services/auth-service";
 import { UserRole } from "@/types/models";
 
 interface NavbarProps {
@@ -29,9 +30,16 @@ export function Navbar({ user }: NavbarProps) {
   const [notifOpen, setNotifOpen] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    authService.logout();
     router.push("/login");
   };
+
+  const profileHref =
+    user?.role === "admin"
+      ? "/admin/dashboard"
+      : user?.role === "support"
+        ? "/support/dashboard"
+        : "/profile";
 
   return (
     <header className="h-16 bg-zinc-900 border-b border-zinc-800 sticky top-0 z-40 flex items-center px-4 md:px-6 gap-3">
@@ -100,7 +108,7 @@ export function Navbar({ user }: NavbarProps) {
               <div className="fixed inset-0 z-40" onClick={() => setDropdownOpen(false)} />
               <div className="absolute right-0 mt-2 w-48 bg-zinc-800 border border-zinc-700 rounded-xl shadow-xl py-1 z-50">
                 <Link
-                  href="/profile"
+                  href={profileHref}
                 onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white transition rounded-lg mx-1"
                 >
