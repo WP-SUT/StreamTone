@@ -11,6 +11,8 @@ import { mockTickets } from "@/mock/tickets";
 import { mockVerifications } from "@/mock/verifications";
 import { mockSettlements } from "@/mock/settlements";
 import { mockPricing } from "@/mock/pricing";
+import { mockNotifications } from "@/mock/notifications";
+import type { AppNotification } from "@/types/models";
 
 const KEYS = {
   USERS: "app_users",
@@ -23,6 +25,7 @@ const KEYS = {
   VERIFICATIONS: "app_verifications",
   SETTLEMENTS: "app_settlements",
   PRICING: "app_pricing",
+  NOTIFICATIONS: "app_notifications",
   SESSION: "app_session",
 } as const;
 
@@ -47,7 +50,7 @@ function remove(key: string): void {
   localStorage.removeItem(key);
 }
 
-const STORAGE_VERSION = "3";
+const STORAGE_VERSION = "4";
 
 export function initStorage(): void {
   if (typeof window === "undefined") return;
@@ -60,6 +63,7 @@ export function initStorage(): void {
     if (!localStorage.getItem(KEYS.VERIFICATIONS)) set(KEYS.VERIFICATIONS, mockVerifications);
     if (!localStorage.getItem(KEYS.SETTLEMENTS)) set(KEYS.SETTLEMENTS, mockSettlements);
     if (!localStorage.getItem(KEYS.PRICING)) set(KEYS.PRICING, mockPricing);
+    if (!localStorage.getItem(KEYS.NOTIFICATIONS)) set(KEYS.NOTIFICATIONS, mockNotifications);
     localStorage.setItem("app_storage_version", STORAGE_VERSION);
   }
 
@@ -73,6 +77,7 @@ export function initStorage(): void {
   if (!localStorage.getItem(KEYS.VERIFICATIONS)) set(KEYS.VERIFICATIONS, mockVerifications);
   if (!localStorage.getItem(KEYS.SETTLEMENTS)) set(KEYS.SETTLEMENTS, mockSettlements);
   if (!localStorage.getItem(KEYS.PRICING)) set(KEYS.PRICING, mockPricing);
+  if (!localStorage.getItem(KEYS.NOTIFICATIONS)) set(KEYS.NOTIFICATIONS, mockNotifications);
 }
 
 export const storage = {
@@ -270,6 +275,28 @@ export const storage = {
     },
     set(pricing: SubscriptionPricing): void {
       set(KEYS.PRICING, pricing);
+    },
+  },
+
+  notifications: {
+    getAll(): AppNotification[] {
+      return get<AppNotification[]>(KEYS.NOTIFICATIONS, []);
+    },
+    setAll(items: AppNotification[]): void {
+      set(KEYS.NOTIFICATIONS, items);
+    },
+    findById(id: string): AppNotification | undefined {
+      return this.getAll().find((n) => n.id === id);
+    },
+    upsert(item: AppNotification): void {
+      const all = this.getAll();
+      const idx = all.findIndex((n) => n.id === item.id);
+      if (idx === -1) all.push(item);
+      else all[idx] = item;
+      this.setAll(all);
+    },
+    remove(id: string): void {
+      this.setAll(this.getAll().filter((n) => n.id !== id));
     },
   },
 

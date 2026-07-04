@@ -70,6 +70,7 @@ export default function MainLayout({
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar
           user={{
+            id: user.id,
             displayName: getDisplayName(user),
             imageUrl: getAvatarUrl(user),
             role: user.role,

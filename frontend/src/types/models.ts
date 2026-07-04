@@ -172,3 +172,16 @@ export interface RevenueOverview {
   monthlyTrend: { month: string; revenue: number }[];
 }
 
+// ─── Notifications ────────────────────────────────────────
+export type NotificationAudience = UserRole | "all";
+
+export interface AppNotification {
+  id: string;
+  userId: string;
+  title: string;
+  body: string;
+  isRead: boolean;
+  href?: string;
+  createdAt: string;
+}
+

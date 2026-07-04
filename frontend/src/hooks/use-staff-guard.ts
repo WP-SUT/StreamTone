@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { storage } from "@/lib/storage";
 import type { StaffUser, UserRole } from "@/types/models";
 
-export function useStaffGuard(...allowedRoles: UserRole[]) {
+export function useStaffGuard(...allowedRoles: Array<"admin" | "support">) {
   const router = useRouter();
   const [user, setUser] = useState<StaffUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -13,7 +13,7 @@ export function useStaffGuard(...allowedRoles: UserRole[]) {
 
   useEffect(() => {
     const session = storage.session.get();
-    if (!session || !allowedRoles.includes(session.role)) {
+    if (!session || !allowedRoles.includes(session.role as "admin" | "support")) {
       setLoading(false);
       router.push("/login");
       return;
