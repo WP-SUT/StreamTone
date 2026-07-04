@@ -44,7 +44,7 @@ export default function AlbumPage() {
   const metadata = (
     <>
       <Link
-        href={`/artists/${album.artistId}`}
+        href={`/users/${album.artistId}`}
         className="text-white font-medium hover:underline"
       >
         {album.artistName}

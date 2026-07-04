@@ -9,7 +9,7 @@ import { PersonalInfoSection } from "@/components/profile/personal-info-section"
 import { ProfileOverviewCard } from "@/components/profile/profile-overview-card";
 import { SubscriptionSection } from "@/components/profile/subscription-section";
 import { UsernameSection } from "@/components/profile/username-section";
-import { formatGender, normalizeUser, type SubscriptionTier, usernameCandidate } from "@/components/profile/profile-utils";
+import { formatGender, normalizeUser, usernameCandidate } from "@/components/profile/profile-utils";
 import { storage } from "@/lib/storage";
 import type { Gender, User } from "@/types/models";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +26,6 @@ interface ProfileDrafts {
   dateOfBirth: string;
   gender: Gender;
   username: string;
-  subscriptionTier: SubscriptionTier;
   avatarUrl: string;
 }
 
@@ -62,7 +61,6 @@ function buildDrafts(user?: User | null): ProfileDrafts {
     dateOfBirth: user?.dateOfBirth ?? "",
     gender: user?.gender ?? "prefer_not_to_say",
     username: user?.username ?? "",
-    subscriptionTier: user?.subscriptionTier ?? "basic",
     avatarUrl: user?.avatarUrl ?? "",
   };
 }
@@ -75,7 +73,6 @@ export function ListenerProfilePage() {
 
   const [editingPersonal, setEditingPersonal] = useState(false);
   const [editingUsername, setEditingUsername] = useState(false);
-  const [editingSubscription, setEditingSubscription] = useState(false);
   const [editingAvatar, setEditingAvatar] = useState(false);
 
   const initialDrafts = useMemo(() => buildDrafts(initialState.currentUser), [initialState.currentUser]);
@@ -84,7 +81,6 @@ export function ListenerProfilePage() {
   const [draftDateOfBirth, setDraftDateOfBirth] = useState(initialDrafts.dateOfBirth);
   const [draftGender, setDraftGender] = useState<Gender>(initialDrafts.gender);
   const [draftUsername, setDraftUsername] = useState(initialDrafts.username);
-  const [draftSubscriptionTier, setDraftSubscriptionTier] = useState<SubscriptionTier>(initialDrafts.subscriptionTier);
   const [draftAvatarUrl, setDraftAvatarUrl] = useState(initialDrafts.avatarUrl);
 
   const viewedUser = useMemo(() => {
@@ -107,7 +103,6 @@ export function ListenerProfilePage() {
     setDraftDateOfBirth(drafts.dateOfBirth);
     setDraftGender(drafts.gender);
     setDraftUsername(drafts.username);
-    setDraftSubscriptionTier(drafts.subscriptionTier);
     setDraftAvatarUrl(drafts.avatarUrl);
   };
 
@@ -215,18 +210,6 @@ export function ListenerProfilePage() {
     toast.success("Username updated");
   };
 
-  const saveSubscription = () => {
-    if (!viewedUser || !isOwnProfile) return;
-
-    updateSingleUser({
-      ...viewedUser,
-      subscriptionTier: draftSubscriptionTier,
-      isPremium: draftSubscriptionTier !== "basic",
-    });
-    setEditingSubscription(false);
-    toast.success("Subscription updated");
-  };
-
   const saveAvatar = () => {
     if (!viewedUser || !isOwnProfile) return;
     if (viewedUser.subscriptionTier === "basic") {
@@ -236,7 +219,7 @@ export function ListenerProfilePage() {
 
     updateSingleUser({
       ...viewedUser,
-      avatarUrl: draftAvatarUrl.trim() || undefined,
+      avatarUrl: draftAvatarUrl || undefined,
     });
     setEditingAvatar(false);
     toast.success("Profile picture updated");
@@ -313,13 +296,7 @@ export function ListenerProfilePage() {
       />
 
       <SubscriptionSection
-        isOwnProfile={isOwnProfile}
-        editing={editingSubscription}
-        draftSubscriptionTier={draftSubscriptionTier}
-        onToggleEditing={() => setEditingSubscription((v) => !v)}
-        onSave={saveSubscription}
-        onCancel={() => setEditingSubscription(false)}
-        onChange={setDraftSubscriptionTier}
+        subscriptionTier={viewedUser.subscriptionTier}
       />
 
       <AvatarSection
@@ -329,7 +306,10 @@ export function ListenerProfilePage() {
         draftAvatarUrl={draftAvatarUrl}
         onToggleEditing={() => setEditingAvatar((v) => !v)}
         onSave={saveAvatar}
-        onCancel={() => setEditingAvatar(false)}
+        onCancel={() => {
+          setDraftAvatarUrl(viewedUser.avatarUrl ?? "");
+          setEditingAvatar(false);
+        }}
         onChange={setDraftAvatarUrl}
       />
 

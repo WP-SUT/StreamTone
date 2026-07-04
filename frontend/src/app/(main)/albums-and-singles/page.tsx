@@ -28,7 +28,8 @@ export default function SearchPage() {
 
     const results = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return { songs: [], albums: [] };
+        console.log("qqq" ,!q , mockAlbums , mockSongs);
+        if (!q) return { songs: mockSongs, albums: mockAlbums };
 
         // Simultaneous search by track title and artist name
         const matchedSongs = mockSongs.filter(
@@ -66,12 +67,13 @@ export default function SearchPage() {
                         new Date(b.releaseYear).getTime() -
                         new Date(a.releaseYear).getTime()
                 );
-
+        
         return { songs: sortedSongs, albums: sortedAlbums };
     }, [query, sort]);
 
     const hasQuery = query.trim().length > 0;
     const totalResults = results.songs.length + results.albums.length;
+    console.log("rrr" ,results)
 
     return (
         <main className="min-h-screen bg-neutral-950 text-white px-4 py-6 md:px-8 sm:px-8 lg:px-8">
@@ -113,13 +115,13 @@ export default function SearchPage() {
 
             {/* Results */}
             <section className="mt-8">
-                {!hasQuery && <EmptyState type="idle" />}
+                {/* {!hasQuery && <EmptyState type="idle" />} */}
 
-                {hasQuery && totalResults === 0 && (
+                {totalResults === 0 && (
                     <EmptyState type="no-results" query={query} />
                 )}
 
-                {hasQuery && totalResults > 0 && (
+                { totalResults > 0 && (
                     <>
                         <p className="text-sm text-muted-foreground">
                             {totalResults} result{totalResults !== 1 ? "s" : ""} for{" "}

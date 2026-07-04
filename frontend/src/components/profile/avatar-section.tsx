@@ -1,11 +1,11 @@
 "use client";
 
+import { useRef, type ChangeEvent } from "react";
 import { Camera, Save, X } from "lucide-react";
 
 import type { User } from "@/types/models";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 
 interface AvatarSectionProps {
   viewedUser: User;
@@ -29,6 +29,16 @@ export function AvatarSection({
   onChange,
 }: AvatarSectionProps) {
   const isBasic = viewedUser.subscriptionTier === "basic";
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    onChange(previewUrl);
+    event.target.value = "";
+  };
 
   return (
     <Card className="border border-zinc-800 bg-zinc-900/60">
@@ -36,7 +46,9 @@ export function AvatarSection({
         <div>
           <CardTitle>Profile picture</CardTitle>
           <CardDescription>
-            {isOwnProfile && isBasic ? "Basic users cannot upload/change profile picture in phase 2" : "Update avatar URL"}
+            {isOwnProfile && isBasic
+              ? "Basic users cannot upload/change profile picture in phase 2"
+              : "Upload image file for your profile picture"}
           </CardDescription>
         </div>
         {isOwnProfile && (
@@ -47,13 +59,21 @@ export function AvatarSection({
         )}
       </CardHeader>
 
-      <CardContent>
-        <Input
-          placeholder="https://..."
-          value={draftAvatarUrl}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={!editing || isBasic}
-        />
+      <CardContent className="space-y-3">
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="button" variant="secondary" disabled={!editing || isBasic} onClick={() => fileInputRef.current?.click()}>
+            Select profile image
+          </Button>
+          <p className="text-xs text-muted-foreground">JPG / PNG / WEBP</p>
+        </div>
+
+        {draftAvatarUrl ? (
+          <p className="text-xs text-muted-foreground">Image selected and ready to save.</p>
+        ) : (
+          <p className="text-xs text-muted-foreground">No image selected yet.</p>
+        )}
       </CardContent>
 
       {isOwnProfile && editing && !isBasic && (
