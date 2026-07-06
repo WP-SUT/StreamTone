@@ -7,7 +7,6 @@ import { z } from "zod";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AuthField } from "@/components/auth/auth-field";
@@ -81,7 +80,7 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
         <Link
-          href="/auth/login"
+          href="/login"
           className="inline-block text-sm text-primary hover:text-primary/80 font-medium transition-colors"
         >
           Back to sign in

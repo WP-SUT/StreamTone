@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { AuthField } from "@/components/auth/auth-field";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import AuthHeader from "@/components/auth/Auth-Header";
+import { authService } from "@/services/auth-service";
+import { UserRole } from "@/types/models";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -23,11 +25,8 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-// Mock: replace with actual auth response role
-type UserRole = "user" | "artist" | "admin" | "support";
-
 const roleRedirectMap: Record<UserRole, string> = {
-  user: "/home",
+  listener: "/home",
   artist: "/artist/dashboard",
   admin: "/admin/dashboard",
   support: "/support/dashboard",
@@ -49,19 +48,21 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
 
-  const onSubmit = async (_data: LoginFormData) => {
+  const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      await new Promise((res) => setTimeout(res, 1200));
-
-      // TODO: replace with real auth call, get role from response
-      const role: UserRole = "user";
-
+      const account = await authService.login(data.email, data.password);
+      console.log(account);
+      
       toast.success("Welcome back!");
-      router.push(roleRedirectMap[role]);
-    } catch {
-      toast.error("Login failed", { description: "Invalid email or password." });
+      router.push(roleRedirectMap[account.role]);
+    } catch (error) {
+      console.error(error);
+      toast.error("Login failed", { 
+        description: error instanceof Error ? error.message : "Invalid email or password." 
+      });
     } finally {
+      console.log("debug");
       setIsLoading(false);
     }
   };
@@ -111,7 +112,7 @@ export default function LoginPage() {
         {/* Forgot password */}
         <div className="flex justify-end -mt-1">
           <Link
-            href="/auth/forgot-password"
+            href="/forgot-password"
             className="text-xs text-primary hover:text-primary/80 transition-colors"
           >
             Forgot password?

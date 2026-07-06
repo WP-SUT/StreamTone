@@ -1,0 +1,100 @@
+import type { Ticket } from "@/types/models";
+
+export const mockTickets: Ticket[] = [
+  {
+    id: "t1",
+    subject: "Cannot play songs on mobile",
+    category: "technical",
+    status: "open",
+    openedById: "u1",
+    messages: [
+      {
+        id: "m1",
+        senderId: "u1",
+        senderRole: "listener",
+        body: "Hi, songs stop after 10 seconds on my phone. Desktop works fine.",
+        sentAt: "2026-07-03T10:00:00Z",
+      },
+    ],
+    createdAt: "2026-07-03T10:00:00Z",
+    updatedAt: "2026-07-03T10:00:00Z",
+  },
+  {
+    id: "t2",
+    subject: "Premium subscription not activated",
+    category: "billing",
+    status: "in_progress",
+    openedById: "u1",
+    assignedToId: "staff_support",
+    messages: [
+      {
+        id: "m2",
+        senderId: "u1",
+        senderRole: "listener",
+        body: "I paid for premium yesterday but my account still shows free plan.",
+        sentAt: "2026-07-02T14:30:00Z",
+      },
+      {
+        id: "m3",
+        senderId: "staff_support",
+        senderRole: "support",
+        body: "Thanks for reaching out. Can you share your payment reference number?",
+        sentAt: "2026-07-02T15:00:00Z",
+      },
+    ],
+    createdAt: "2026-07-02T14:30:00Z",
+    updatedAt: "2026-07-02T15:00:00Z",
+  },
+  {
+    id: "t3",
+    subject: "Report incorrect album metadata",
+    category: "content",
+    status: "resolved",
+    openedById: "u1",
+    assignedToId: "staff_support",
+    messages: [
+      {
+        id: "m4",
+        senderId: "u1",
+        senderRole: "listener",
+        body: "The album year for Shayad is wrong — it should be 2022.",
+        sentAt: "2026-07-01T09:00:00Z",
+      },
+      {
+        id: "m5",
+        senderId: "staff_support",
+        senderRole: "support",
+        body: "Fixed. Thanks for the report!",
+        sentAt: "2026-07-01T11:00:00Z",
+      },
+    ],
+    createdAt: "2026-07-01T09:00:00Z",
+    updatedAt: "2026-07-01T11:00:00Z",
+  },
+  {
+    id: "t4",
+    subject: "Account deletion request",
+    category: "other",
+    status: "closed",
+    openedById: "u1",
+    assignedToId: "staff_support",
+    messages: [
+      {
+        id: "m6",
+        senderId: "u1",
+        senderRole: "listener",
+        body: "Please delete my account permanently.",
+        sentAt: "2026-06-28T16:00:00Z",
+      },
+      {
+        id: "m7",
+        senderId: "staff_support",
+        senderRole: "support",
+        body: "Your account has been scheduled for deletion within 7 days.",
+        sentAt: "2026-06-28T17:00:00Z",
+      },
+    ],
+    createdAt: "2026-06-28T16:00:00Z",
+    updatedAt: "2026-06-28T17:00:00Z",
+  },
+];

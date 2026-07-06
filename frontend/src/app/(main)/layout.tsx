@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar/sidebar";
 import { Navbar } from "@/components/layout/navbar/navbar";
-
-import type { User, Artist, StaffUser, Song } from "@/types";
 import FooterPlayer from "@/components/layout/player/footer-player";
+
+import type { User, Artist, StaffUser } from "@/types/models";
+import MiniPlayer from "@/components/layout/player/mini-player";
+import { storage } from "@/lib/storage";
 
 // Any logged-in user can be one of these three shapes
 type AuthedUser = User | Artist | StaffUser;
@@ -30,25 +32,11 @@ export default function MainLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<AuthedUser | null>(null);
-  const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Auth guard
   useEffect(() => {
-    const storedUser = {
-    id: "u1",
-    displayName: "Soroush",
-    email: "soroush@example.com",
-    dateOfBirth: "1998-05-10",
-    gender: "male",
-    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=soroush",
-    role: "listener",
-    isPremium: false,
-    followingArtistIds: ["a1"],
-    followerIds: [],
-    playlistIds: ["pl1"],
-    createdAt: "2024-01-01T00:00:00Z",
-  }
+    const storedUser = storage.session.get();
     if (!storedUser) {
       router.push("/login");
       return;
@@ -60,30 +48,6 @@ export default function MainLayout({
     }
   }, [router]);
 
-  // Mock: simulate a song loading (replace with Zustand player state later)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      // Uses the actual Song type — all required fields present
-      const demSong: Song = {
-        id: "s1",
-        title: "Ey Iran",
-        artistId: "a1",
-        artistName: "Dariush",
-        albumId: "alb1",
-        coverUrl: "https://picsum.photos/seed/s1/300/300",
-        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        duration: 214,
-        genre: "Pop",
-        releaseYear: 2022,
-        streamCount: 980000,
-        isSingle: false,
-        createdAt: "2022-06-01T00:00:00Z",
-      };
-      setCurrentSong(demSong);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
   if (!user) {
     return (
       <div className="h-screen bg-zinc-950 flex items-center justify-center">
@@ -91,6 +55,8 @@ export default function MainLayout({
       </div>
     );
   }
+
+  const isStaff = user.role === "admin" || user.role === "support";
 
   return (
     <div className="h-screen bg-zinc-950 text-white flex overflow-hidden">
@@ -104,18 +70,19 @@ export default function MainLayout({
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar
           user={{
+            id: user.id,
             displayName: getDisplayName(user),
             imageUrl: getAvatarUrl(user),
             role: user.role,
           }}
         />
 
-        <main className="flex-1 overflow-y-auto pb-20">
+        <main className={`flex-1 overflow-y-auto ${isStaff ? "pb-6" : "pb-20"}`}>
           {children}
         </main>
       </div>
-
-      <FooterPlayer currentSong={currentSong} />
+      {!isStaff && <MiniPlayer />}
+      {!isStaff && <FooterPlayer />}
     </div>
   );
 }

@@ -1,16 +1,22 @@
 // ─── User roles ───────────────────────────────────────────
 export type UserRole = "listener" | "artist" | "support" | "admin";
+export type Gender = "male" | "female" | "other" | "prefer_not_to_say"
 
 // ─── Listener (ordinary user) ─────────────────────────────
 export interface User {
   id: string;
   displayName: string;
+  username: string;
+  password: string;
   email: string;
   dateOfBirth: string;       // ISO date string
-  gender: "male" | "female" | "other" | "prefer_not_to_say";
+  gender: Gender;
   avatarUrl?: string;
   role: "listener";
   isPremium: boolean;
+  subscriptionTier: "gold" | "silver" | "basic";
+  dailyStreamCount: number;
+  followingUserIds: string[];
   followingArtistIds: string[];
   followerIds: string[];
   playlistIds: string[];
@@ -21,6 +27,7 @@ export interface User {
 export interface Artist {
   id: string;
   artistName: string;
+   password: string;
   email: string;
   avatarUrl?: string;
   bio?: string;
@@ -39,6 +46,7 @@ export interface Artist {
 export interface StaffUser {
   id: string;
   displayName: string;
+   password: string;
   email: string;
   role: "support" | "admin";
   avatarUrl?: string;
@@ -54,6 +62,7 @@ export interface Song {
   albumId?: string;
   coverUrl: string | undefined;
   audioUrl: string;
+  dominantColor: string;
   duration: number;          // seconds
   genre: string;
   releaseYear: number;
@@ -86,7 +95,6 @@ export interface Playlist {
   ownerId: string;           // User id
   coverUrl?: string;
   songIds: string[];
-  isPublic: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -140,13 +148,57 @@ export interface Subscription {
   isActive: boolean;
 }
 
-// ─── Player state (used in Zustand) ───────────────────────
-export interface PlayerState {
-  currentSong: Song | null;
-  queue: Song[];
-  isPlaying: boolean;
-  volume: number;            // 0–1
-  progress: number;          // seconds
-  repeatMode: "off" | "one" | "all";
-  isShuffle: boolean;
+// ─── Notifications ─────────────────────────────────────────
+export type NotificationKind =
+  | "subscription_expiry"      // listener: subscription expiry warning
+  | "new_release"              // listener: followed artist published a new work
+  | "artist_approval"          // artist: account approved/rejected with reason
+  | "monthly_payout"           // artist: monthly payout/settlement
+  | "new_ticket"               // support/admin: new user ticket
+  | "new_verification_request" // support/admin: new artist verification request
+  | "general";
+
+export interface AppNotification {
+  id: string;
+  recipientRole: Extract<UserRole, "listener" | "artist" | "support" | "admin">;
+  recipientId: string;    // User.id or Artist.id depending on role
+  kind: NotificationKind;
+  title: string;
+  body: string;
+  linkUrl?: string;       // optional deep-link
+  linkLabel?: string;     // CTA label
+  isRead: boolean;
+  createdAt: string;      // ISO date
 }
+
+
+// ─── Artist settlements ───────────────────────────────────
+export type PaymentStatus = "pending" | "settled";
+
+export interface ArtistSettlement {
+  id: string;
+  artistId: string;
+  artistName: string;
+  month: string;
+  uniqueListeners: number;
+  totalStreams: number;
+  rewardAmount: number;
+  paymentStatus: PaymentStatus;
+}
+
+// ─── Subscription pricing (admin-controlled) ──────────────
+export interface SubscriptionPricing {
+  silverMonthly: number;
+  goldMonthly: number;
+  updatedAt: string;
+}
+
+export interface RevenueOverview {
+  totalRevenue: number;
+  monthlyRevenue: number;
+  subscriptionBreakdown: { free: number; silver: number; gold: number };
+  monthlyTrend: { month: string; revenue: number }[];
+}
+
+
+
