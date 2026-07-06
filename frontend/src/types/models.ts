@@ -6,6 +6,7 @@ export type Gender = "male" | "female" | "other" | "prefer_not_to_say"
 export interface User {
   id: string;
   displayName: string;
+  username: string;
   password: string;
   email: string;
   dateOfBirth: string;       // ISO date string
@@ -13,6 +14,9 @@ export interface User {
   avatarUrl?: string;
   role: "listener";
   isPremium: boolean;
+  subscriptionTier: "gold" | "silver" | "basic";
+  dailyStreamCount: number;
+  followingUserIds: string[];
   followingArtistIds: string[];
   followerIds: string[];
   playlistIds: string[];
@@ -143,6 +147,30 @@ export interface Subscription {
   endDate?: string;
   isActive: boolean;
 }
+
+// ─── Notifications ─────────────────────────────────────────
+export type NotificationKind =
+  | "subscription_expiry"      // listener: subscription expiry warning
+  | "new_release"              // listener: followed artist published a new work
+  | "artist_approval"          // artist: account approved/rejected with reason
+  | "monthly_payout"           // artist: monthly payout/settlement
+  | "new_ticket"               // support/admin: new user ticket
+  | "new_verification_request" // support/admin: new artist verification request
+  | "general";
+
+export interface AppNotification {
+  id: string;
+  recipientRole: Extract<UserRole, "listener" | "artist" | "support" | "admin">;
+  recipientId: string;    // User.id or Artist.id depending on role
+  kind: NotificationKind;
+  title: string;
+  body: string;
+  linkUrl?: string;       // optional deep-link
+  linkLabel?: string;     // CTA label
+  isRead: boolean;
+  createdAt: string;      // ISO date
+}
+
 
 // ─── Artist settlements ───────────────────────────────────
 export type PaymentStatus = "pending" | "settled";

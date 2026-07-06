@@ -1,10 +1,11 @@
-import type { User, Artist, Song, Album, Playlist, StaffUser, Ticket, VerificationRequest, ArtistSettlement, SubscriptionPricing } from "@/types/models";
+import type { User, Artist, Song, Album, Playlist,AppNotification,UserRole, StaffUser, Ticket, VerificationRequest, ArtistSettlement, SubscriptionPricing } from "@/types/models";
 import {
   mockUsers,
   mockArtists,
   mockSongs,
   mockAlbums,
   mockPlaylists,
+  mockNotifications,
 } from "@/mock/data";
 import { mockStaff } from "@/mock/staff";
 import { mockTickets } from "@/mock/tickets";
@@ -27,6 +28,7 @@ const KEYS = {
   PRICING: "app_pricing",
   NOTIFICATIONS: "app_notifications",
   SESSION: "app_session",
+    NOTIFICATIONS: "app_notifications",
 } as const;
 
 function get<T>(key: string, fallback: T): T {
@@ -309,6 +311,42 @@ export const storage = {
     },
     clear(): void {
       remove(KEYS.SESSION);
+    },
+  },
+
+  notifications: {
+    getAll(): AppNotification[] {
+      return get<AppNotification[]>(KEYS.NOTIFICATIONS, []);
+    },
+    setAll(notifications: AppNotification[]): void {
+      set(KEYS.NOTIFICATIONS, notifications);
+    },
+    findByRecipient(recipientRole: Extract<UserRole, "listener" | "artist" | "support" | "admin">, recipientId: string): AppNotification[] {
+      return this.getAll().filter((n) => n.recipientRole === recipientRole && n.recipientId === recipientId);
+    },
+    upsert(notification: AppNotification): void {
+      const all = this.getAll();
+      const idx = all.findIndex((n) => n.id === notification.id);
+      if (idx === -1) all.unshift(notification);
+      else all[idx] = notification;
+      this.setAll(all);
+    },
+    remove(id: string): void {
+      this.setAll(this.getAll().filter((n) => n.id !== id));
+    },
+    markAsRead(id: string): void {
+      const all = this.getAll();
+      const idx = all.findIndex((n) => n.id === id);
+      if (idx !== -1) {
+        all[idx] = { ...all[idx], isRead: true };
+        this.setAll(all);
+      }
+    },
+    markAllAsReadForRecipient(recipientRole: Extract<UserRole, "listener" | "artist" | "support" | "admin">, recipientId: string): void {
+      const next = this.getAll().map((n) =>
+        n.recipientRole === recipientRole && n.recipientId === recipientId ? { ...n, isRead: true } : n
+      );
+      this.setAll(next);
     },
   },
 };

@@ -50,7 +50,7 @@ export default function AlbumCard({
     <>
       {artistId ? (
         <Link
-          href={`/artists/${artistId}`}
+          href={`/users/${artistId}`}
           className="hover:text-white hover:underline truncate"
         >
           {artist}

@@ -29,7 +29,8 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Home",href: "/home",             icon: Home,        roles: ["listener", "artist"] },
   { label: "Playlists",        href: "/playlists",        icon: ListMusic,   roles: ["listener", "artist"] },
   { label: "Albums & Singles", href: "/albums-and-singles",           icon: Disc3,       roles: ["listener", "artist"] },
-  { label: "Profile",          href: "/profile",          icon: User,        roles: ["listener", "artist"] },
+  { label: "Artist Dashboard", href: "/artist/dashboard", icon: AudioLines,  roles: ["artist"] },
+  { label: "Profile",          href: "/profile",          icon: User,        roles: ["listener"] },
   { label: "Settings",         href: "/settings",         icon: Settings,    roles: ["listener", "artist"] },
   { label: "Notifications",    href: "/notifications",    icon: Bell,        roles: ["listener", "artist"] },
 
