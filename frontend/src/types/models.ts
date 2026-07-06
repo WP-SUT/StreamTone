@@ -144,4 +144,44 @@ export interface Subscription {
   isActive: boolean;
 }
 
+// ─── Artist settlements ───────────────────────────────────
+export type PaymentStatus = "pending" | "settled";
+
+export interface ArtistSettlement {
+  id: string;
+  artistId: string;
+  artistName: string;
+  month: string;
+  uniqueListeners: number;
+  totalStreams: number;
+  rewardAmount: number;
+  paymentStatus: PaymentStatus;
+}
+
+// ─── Subscription pricing (admin-controlled) ──────────────
+export interface SubscriptionPricing {
+  silverMonthly: number;
+  goldMonthly: number;
+  updatedAt: string;
+}
+
+export interface RevenueOverview {
+  totalRevenue: number;
+  monthlyRevenue: number;
+  subscriptionBreakdown: { free: number; silver: number; gold: number };
+  monthlyTrend: { month: string; revenue: number }[];
+}
+
+// ─── Notifications ────────────────────────────────────────
+export type NotificationAudience = UserRole | "all";
+
+export interface AppNotification {
+  id: string;
+  userId: string;
+  title: string;
+  body: string;
+  isRead: boolean;
+  href?: string;
+  createdAt: string;
+}
 
