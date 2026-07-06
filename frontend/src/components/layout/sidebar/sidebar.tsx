@@ -4,9 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home, ListMusic, Disc3, User, Settings,
-  TicketCheck, UserCheck, ChevronLeft, ChevronRight, ShieldCheck,
-  AudioLines,
+  Home, ListMusic, Disc3, User, Settings, LayoutDashboard, Bell,
+  TicketCheck, UserCheck, ChevronLeft, ChevronRight, ShieldCheck, Shield,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 
@@ -33,14 +32,20 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Artist Dashboard", href: "/artist/dashboard", icon: AudioLines,  roles: ["artist"] },
   { label: "Profile",          href: "/profile",          icon: User,        roles: ["listener"] },
   { label: "Settings",         href: "/settings",         icon: Settings,    roles: ["listener", "artist"] },
+  { label: "Notifications",    href: "/notifications",    icon: Bell,        roles: ["listener", "artist"] },
 
+  { label: "Dashboard",        href: "/support/dashboard", icon: LayoutDashboard, roles: ["support"] },
   { label: "Tickets",          href: "/support/tickets",  icon: TicketCheck, roles: ["support"] },
+  { label: "Artist Approvals", href: "/support/approvals", icon: UserCheck, roles: ["support"] },
+  { label: "Notifications",    href: "/notifications",    icon: Bell,        roles: ["support"] },
   { label: "Settings",         href: "/settings",         icon: Settings,    roles: ["support"] },
 
+  { label: "Dashboard",        href: "/admin/dashboard",  icon: LayoutDashboard, roles: ["admin"] },
   { label: "Tickets",          href: "/admin/tickets",    icon: TicketCheck, roles: ["admin"] },
   { label: "Artist Approvals", href: "/admin/approvals",  icon: UserCheck,   roles: ["admin"] },
   { label: "Management",       href: "/admin/management", icon: ShieldCheck, roles: ["admin"] },
-  { label: "Settings",         href: "/settings",         icon: Settings,    roles: ["admin"] },
+  { label: "Roles",            href: "/admin/roles",      icon: Shield,      roles: ["admin"] },
+  { label: "Notifications",    href: "/notifications",    icon: Bell,        roles: ["admin"] },
 ];
 
 export function Sidebar({

@@ -85,7 +85,7 @@ export default function ArtistRegisterPage() {
         description: "Your account is pending approval. We'll notify you via email.",
       });
 
-      router.push("/auth/login");
+      router.push("/login");
     } catch {
       toast.error("Registration failed", {
         description: "Please try again later.",
