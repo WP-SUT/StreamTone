@@ -1,7 +1,6 @@
-// src/components/layout/navbar.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -14,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { UserRole } from "@/types/models";
+import { storage } from "@/lib/storage";
 
 interface NavbarProps {
   user?: {
@@ -26,12 +26,29 @@ interface NavbarProps {
 export function Navbar({ user }: NavbarProps) {
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    // Clear session in our storage as well
+    try { storage.session.clear(); } catch {}
     router.push("/login");
   };
+
+  useEffect(() => {
+    // compute unread count from storage session
+    const session = storage.session.get() as any;
+    if (session && ["listener", "artist", "support", "admin"].includes(session.role)) {
+      try {
+        const list = storage.notifications.findByRecipient(session.role, session.id);
+        setUnreadCount(list.filter((n) => !n.isRead).length);
+      } catch {
+        setUnreadCount(0);
+      }
+    } else {
+      setUnreadCount(0);
+    }
+  }, []);
 
   return (
     <header className="h-16 bg-zinc-900 border-b border-zinc-800 sticky top-0 z-40 flex items-center px-4 md:px-6 gap-3">
@@ -43,37 +60,21 @@ export function Navbar({ user }: NavbarProps) {
         {/* Notifications */}
         <div className="relative">
           <button
-            onClick={() => { setNotifOpen((p) => !p); setDropdownOpen(false); }}
+            onClick={() => { setDropdownOpen(false); router.push("/notifications"); }}
             className="relative p-2 rounded-full hover:bg-zinc-800 transition"
             aria-label="Notifications"
           >
             <Bell className="w-5 h-5 text-zinc-300" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full" />
+            )}
           </button>
-
-          {notifOpen && (
-            <>
-              {/* backdrop */}
-              <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
-              <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] bg-zinc-800 border border-zinc-700 rounded-xl shadow-xl py-2 z-50">
-                <p className="px-4 py-2 text-xs text-zinc-500 uppercase tracking-wide">
-                  Notifications
-                </p>
-                <div className="px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-700 cursor-pointer rounded-lg mx-1 transition">
-                  Your track was approved 🎵
-                </div>
-                <div className="px-4 py-3 text-sm text-zinc-400 hover:bg-zinc-700 cursor-pointer rounded-lg mx-1 transition">
-                  No more notifications
-                </div>
-              </div>
-            </>
-          )}
         </div>
 
         {/* User menu */}
         <div className="relative">
           <button
-            onClick={() => { setDropdownOpen((p) => !p); setNotifOpen(false); }}
+            onClick={() => { setDropdownOpen((p) => !p); }}
             className="flex items-center gap-2 p-1.5 rounded-full hover:bg-zinc-800 transition"
           >
             {user?.imageUrl ? (
@@ -106,6 +107,14 @@ export function Navbar({ user }: NavbarProps) {
                 >
                   <User className="w-4 h-4" />
                   Profile
+                </Link>
+                <Link
+                  href="/notifications"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white transition rounded-lg mx-1"
+                >
+                  <Bell className="w-4 h-4" />
+                  Notifications
                 </Link>
                 <Link
                   href="/settings"

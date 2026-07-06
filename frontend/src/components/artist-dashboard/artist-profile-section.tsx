@@ -165,15 +165,7 @@ export function ArtistProfileSection({ artist, totalWorks, totalStreams, onSave 
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <Label className="flex items-center gap-2">
-              <Camera className="size-4" /> Avatar URL
-            </Label>
-            <Input
-              value={editing ? draft.avatarUrl : artist.avatarUrl ?? ""}
-              onChange={(e) => setDraft((prev) => ({ ...prev, avatarUrl: e.target.value }))}
-              disabled={!editing}
-              placeholder="https://..."
-            />
+            
 
             {editing && (
               <div className="flex flex-wrap items-center gap-2">
