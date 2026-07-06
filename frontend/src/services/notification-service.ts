@@ -8,7 +8,7 @@ export const notificationService = {
     await delay();
     return storage.notifications
       .getAll()
-      .filter((n) => n.userId === userId)
+      .filter((n) => n.recipientId === userId)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   },
 
@@ -28,7 +28,7 @@ export const notificationService = {
     await delay(200);
     const all = storage.notifications.getAll();
     storage.notifications.setAll(
-      all.map((n) => (n.userId === userId ? { ...n, isRead: true } : n))
+      all.map((n) => (n.recipientId === userId ? { ...n, isRead: true } : n))
     );
   },
 

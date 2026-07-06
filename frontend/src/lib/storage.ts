@@ -296,6 +296,9 @@ export const storage = {
     setAll(notifications: AppNotification[]): void {
       set(KEYS.NOTIFICATIONS, notifications);
     },
+    findById(id: string): AppNotification | undefined {
+      return this.getAll().find((v) => v.id === id);
+    },
     findByRecipient(recipientRole: Extract<UserRole, "listener" | "artist" | "support" | "admin">, recipientId: string): AppNotification[] {
       return this.getAll().filter((n) => n.recipientRole === recipientRole && n.recipientId === recipientId);
     },
