@@ -1,4 +1,4 @@
-import type { User, Artist, Song, Album, Playlist } from "@/types/models";
+import type { User, Artist, Song, Album, Playlist, AppNotification, StaffUser } from "@/types/models";
 
 export const mockUsers: User[] = [
   {
@@ -12,7 +12,7 @@ export const mockUsers: User[] = [
     avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=soroush",
     role: "listener",
     isPremium: false,
-    subscriptionTier: "basic",
+    subscriptionTier: "gold",
     dailyStreamCount: 37,
     followingUserIds: [],
     followingArtistIds: ["a1"],
@@ -58,6 +58,28 @@ export const mockArtists: Artist[] = [
     singleIds: ["s2"],
     role: "artist",
     createdAt: "2023-01-01T00:00:00Z",
+  },
+];
+
+// Optional: example staff users. These are not currently referenced elsewhere but useful for seeding session testing.
+export const mockStaff: StaffUser[] = [
+  {
+    id: "st1",
+    displayName: "Support Agent",
+    password: "11111111",
+    email: "support@example.com",
+    role: "support",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=support",
+    createdAt: "2024-02-01T00:00:00Z",
+  },
+  {
+    id: "ad1",
+    displayName: "Admin User",
+    password: "11111111",
+    email: "admin@example.com",
+    role: "admin",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=admin",
+    createdAt: "2024-02-01T00:00:00Z",
   },
 ];
 
@@ -166,4 +188,80 @@ export const mockPlaylists: Playlist[] = [
     createdAt: "2024-02-01T00:00:00Z",
     updatedAt: "2024-02-01T00:00:00Z",
   }
+];
+
+export const mockNotifications: AppNotification[] = [
+  // Listener notifications
+  {
+    id: "n1",
+    recipientRole: "listener",
+    recipientId: "u1",
+    kind: "subscription_expiry",
+    title: "Your subscription is expiring soon",
+    body: "Your Premium plan will expire in 5 days. Renew now to keep your benefits.",
+    linkUrl: "/settings",
+    linkLabel: "Manage plan",
+    isRead: false,
+    createdAt: "2025-12-25T09:00:00Z",
+  },
+  {
+    id: "n2",
+    recipientRole: "listener",
+    recipientId: "u1",
+    kind: "new_release",
+    title: "New album from Dariush",
+    body: "Dariush just released a new album 'Shayad'. Give it a listen!",
+    linkUrl: "/albums/alb1",
+    linkLabel: "Open album",
+    isRead: false,
+    createdAt: "2026-01-10T14:00:00Z",
+  },
+  // Artist notifications
+  {
+    id: "n3",
+    recipientRole: "artist",
+    recipientId: "a1",
+    kind: "artist_approval",
+    title: "Artist account approved",
+    body: "Congratulations! Your artist account has been approved.",
+    isRead: true,
+    createdAt: "2024-01-05T10:00:00Z",
+  },
+  {
+    id: "n4",
+    recipientRole: "artist",
+    recipientId: "a1",
+    kind: "monthly_payout",
+    title: "Monthly payout available",
+    body: "Your June payout report is ready. Review your settlement details.",
+    linkUrl: "/artist/dashboard",
+    linkLabel: "View dashboard",
+    isRead: false,
+    createdAt: "2026-06-30T18:30:00Z",
+  },
+  // Staff notifications
+  {
+    id: "n5",
+    recipientRole: "support",
+    recipientId: "st1",
+    kind: "new_ticket",
+    title: "New ticket opened",
+    body: "A new billing ticket has been opened by user nika@example.com.",
+    linkUrl: "/support/tickets",
+    linkLabel: "Open tickets",
+    isRead: false,
+    createdAt: "2026-06-28T09:00:00Z",
+  },
+  {
+    id: "n6",
+    recipientRole: "admin",
+    recipientId: "ad1",
+    kind: "new_verification_request",
+    title: "New artist verification request",
+    body: "A new artist verification request has been submitted and awaits review.",
+    linkUrl: "/admin/verification-requests",
+    linkLabel: "Review requests",
+    isRead: false,
+    createdAt: "2026-06-29T11:30:00Z",
+  },
 ];

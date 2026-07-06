@@ -168,41 +168,15 @@ export function ArtistProfilePage({ artistId }: ArtistProfilePageProps) {
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline">Followers: {computedFollowers.toLocaleString()}</Badge>
               <Badge variant="outline">Published works: {totalPublishedWorks}</Badge>
+              <Button onClick={toggleFollowByActiveViewer} disabled={!activeViewer}>
+                {isFollowedByActiveViewer ? <UserRoundCheck className="size-4" /> : <UserPlus className="size-4" />}
+                {isFollowedByActiveViewer ? "Unfollow Artist" : "Follow Artist"}
+          </Button>
             </div>
           </div>
         </CardHeader>
       </Card>
 
-      <Card className="border border-zinc-800 bg-zinc-900/60">
-        <CardHeader>
-          <CardTitle className="text-base">Follow / Unfollow (Mock viewer)</CardTitle>
-          <CardDescription>
-            چون دیتا Mock هست، می‌تونی نقش یک listener رو انتخاب کنی و فالو/آنفالو هنرمند رو تست کنی.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-2">
-            <label htmlFor="listener-viewer" className="text-sm text-muted-foreground">Viewer</label>
-            <select
-              id="listener-viewer"
-              className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
-              value={activeViewer?.id ?? ""}
-              onChange={(e) => setActiveViewerId(e.target.value)}
-            >
-              {listeners.map((listener) => (
-                <option key={listener.id} value={listener.id}>
-                  {listener.displayName} ({listener.subscriptionTier})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <Button onClick={toggleFollowByActiveViewer} disabled={!activeViewer}>
-            {isFollowedByActiveViewer ? <UserRoundCheck className="size-4" /> : <UserPlus className="size-4" />}
-            {isFollowedByActiveViewer ? "Unfollow Artist" : "Follow Artist"}
-          </Button>
-        </CardContent>
-      </Card>
 
       {activeViewer?.subscriptionTier === "gold" && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

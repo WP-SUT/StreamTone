@@ -1,10 +1,11 @@
-import type { User, Artist, Song, Album, Playlist } from "@/types/models";
+import type { User, Artist, Song, Album, Playlist, AppNotification, StaffUser, UserRole } from "@/types/models";
 import {
   mockUsers,
   mockArtists,
   mockSongs,
   mockAlbums,
   mockPlaylists,
+  mockNotifications,
 } from "@/mock/data";
 
 const KEYS = {
@@ -14,6 +15,7 @@ const KEYS = {
   ALBUMS: "app_albums",
   PLAYLISTS: "app_playlists",
   SESSION: "app_session",
+    NOTIFICATIONS: "app_notifications",
 } as const;
 
 function get<T>(key: string, fallback: T): T {
@@ -44,6 +46,7 @@ export function initStorage(): void {
   if (!localStorage.getItem(KEYS.SONGS)) set(KEYS.SONGS, mockSongs);
   if (!localStorage.getItem(KEYS.ALBUMS)) set(KEYS.ALBUMS, mockAlbums);
   if (!localStorage.getItem(KEYS.PLAYLISTS)) set(KEYS.PLAYLISTS, mockPlaylists);
+  if (!localStorage.getItem(KEYS.NOTIFICATIONS)) set(KEYS.NOTIFICATIONS, mockNotifications);
 }
 
 export const storage = {
@@ -167,14 +170,50 @@ export const storage = {
   },
 
   session: {
-    get(): User | Artist | null {
-      return get<User | Artist | null>(KEYS.SESSION, null);
+    get(): User | Artist | StaffUser | null {
+      return get<User | Artist | StaffUser | null>(KEYS.SESSION, null);
     },
-    set(user: User | Artist): void {
+    set(user: User | Artist | StaffUser): void {
       set(KEYS.SESSION, user);
     },
     clear(): void {
       remove(KEYS.SESSION);
+    },
+  },
+
+  notifications: {
+    getAll(): AppNotification[] {
+      return get<AppNotification[]>(KEYS.NOTIFICATIONS, []);
+    },
+    setAll(notifications: AppNotification[]): void {
+      set(KEYS.NOTIFICATIONS, notifications);
+    },
+    findByRecipient(recipientRole: Extract<UserRole, "listener" | "artist" | "support" | "admin">, recipientId: string): AppNotification[] {
+      return this.getAll().filter((n) => n.recipientRole === recipientRole && n.recipientId === recipientId);
+    },
+    upsert(notification: AppNotification): void {
+      const all = this.getAll();
+      const idx = all.findIndex((n) => n.id === notification.id);
+      if (idx === -1) all.unshift(notification);
+      else all[idx] = notification;
+      this.setAll(all);
+    },
+    remove(id: string): void {
+      this.setAll(this.getAll().filter((n) => n.id !== id));
+    },
+    markAsRead(id: string): void {
+      const all = this.getAll();
+      const idx = all.findIndex((n) => n.id === id);
+      if (idx !== -1) {
+        all[idx] = { ...all[idx], isRead: true };
+        this.setAll(all);
+      }
+    },
+    markAllAsReadForRecipient(recipientRole: Extract<UserRole, "listener" | "artist" | "support" | "admin">, recipientId: string): void {
+      const next = this.getAll().map((n) =>
+        n.recipientRole === recipientRole && n.recipientId === recipientId ? { ...n, isRead: true } : n
+      );
+      this.setAll(next);
     },
   },
 };
